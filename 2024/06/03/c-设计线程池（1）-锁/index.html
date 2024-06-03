@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"www.examp.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="线程池的好处线程的开启也是一个相对缓慢的过程。  如果不用线程池，在系统运行过程中实时开启线程，销毁线程。会极大增加系统的负载。导致系统的实时性减低，业务处理能力也会降低 服务器启动时，就事先创建好线程池，当业务来到时，直接从线程池取出一个线程来执行任务。任务完成后直接把线程归还给池，用于后续重复使用。  线程池的模式 固定大小 可变大小  线程同步并发编程的基本问题：  互斥 通信  我们希望有">
 <meta property="og:type" content="article">
 <meta property="og:title" content="c++ 设计线程池（1）----锁">
-<meta property="og:url" content="http://example.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/index.html">
+<meta property="og:url" content="https://www.examp.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/index.html">
 <meta property="og:site_name" content="wqllyx的网站">
 <meta property="og:description" content="线程池的好处线程的开启也是一个相对缓慢的过程。  如果不用线程池，在系统运行过程中实时开启线程，销毁线程。会极大增加系统的负载。导致系统的实时性减低，业务处理能力也会降低 服务器启动时，就事先创建好线程池，当业务来到时，直接从线程池取出一个线程来执行任务。任务完成后直接把线程归还给池，用于后续重复使用。  线程池的模式 固定大小 可变大小  线程同步并发编程的基本问题：  互斥 通信  我们希望有">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="计算机">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/">
+<link rel="canonical" href="https://www.examp.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/">
 
 
 <script id="page-configurations">
@@ -151,7 +151,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/">
+    <link itemprop="mainEntityOfPage" href="https://www.examp.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">

@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"www.examp.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="计算机系统中的并发多处理器：有多个处理器插座。 多核：一个处理器插座，只能有一个处理器安装，一个处理器有多个核心（独立执行计算的单元），每个核心可以有多个硬件线程（hart） 何为并发？并发：单个系统在同时执行多个独立的任务。  硬件并发：一台计算机系统提供多个核心、单个CPU提供多个硬件线程（hart）。 软件并发：单个核心执行任务切换（task switch）。  如果只有纯硬件并发，那么计算">
 <meta property="og:type" content="article">
 <meta property="og:title" content="多线程与并发编程（1）----何为并发">
-<meta property="og:url" content="http://example.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/index.html">
+<meta property="og:url" content="https://www.examp.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/index.html">
 <meta property="og:site_name" content="wqllyx的网站">
 <meta property="og:description" content="计算机系统中的并发多处理器：有多个处理器插座。 多核：一个处理器插座，只能有一个处理器安装，一个处理器有多个核心（独立执行计算的单元），每个核心可以有多个硬件线程（hart） 何为并发？并发：单个系统在同时执行多个独立的任务。  硬件并发：一台计算机系统提供多个核心、单个CPU提供多个硬件线程（hart）。 软件并发：单个核心执行任务切换（task switch）。  如果只有纯硬件并发，那么计算">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="c++  多线程">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/">
+<link rel="canonical" href="https://www.examp.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/">
 
 
 <script id="page-configurations">
@@ -151,7 +151,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/">
+    <link itemprop="mainEntityOfPage" href="https://www.examp.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
