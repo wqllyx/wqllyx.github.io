@@ -148,6 +148,162 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89/" class="post-title-link" itemprop="url">操作系统-多线程编程（1）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-04 08:10:36" itemprop="dateCreated datePublished" datetime="2024-06-04T08:10:36+08:00">2024-06-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>内核级阻塞与应用级阻塞</p>
+<p>异步与同步：</p>
+<p>阻塞与非阻塞：</p>
+<h2 id="线程概念"><a href="#线程概念" class="headerlink" title="线程概念"></a>线程概念</h2><p>linux进程可以看做只有一个单独控制线程的进程：单一线程的进程在同一时间只能做一件事。</p>
+<p>单一进程中有了多个控制线程之后，可以将程序设计成某一时刻能够做不止一件事。每个线程都可以同时处理各自的任务。</p>
+<p>单处理器上可以实现快速的线程切换（相比于进程切换开销小很多），这样相当于”同时”做着不同的任务。</p>
+<blockquote>
+<p>多线程优点：</p>
+</blockquote>
+<ul>
+<li>在处理异步（应用程序不会被异步事件阻塞。但内核里实际有可能阻塞。）事件时，可以简化处理代码。在单线程时，多个异步事件需要单个安排执行适当的顺序，在多线程时，单个异步事件分别交给不同的线程处理，单个线程内部使用同步模型，处理事件。简化了编程的复杂度。</li>
+<li>多个进程之间的内存和文件描述符<strong>共享</strong>需要依赖操作系统提供的复杂机制，多个线程之间本就共享进程的存储空间和文件描述符。</li>
+<li>要解决的问题本身就是可以分解成多个独立的任务的。这时，使用多线程明显可以提高系统的吞吐量。</li>
+<li>交互式程序可以使用多线程来改善响应时间：输入输出（IO）可以与其他处理IO的逻辑分别执行。</li>
+</ul>
+<blockquote>
+<p>每个线程包含的信息（数据结构和资源）：</p>
+</blockquote>
+<ul>
+<li>线程ID</li>
+<li>单独的寄存器值</li>
+<li>单独栈</li>
+<li>调度的优先级和策略</li>
+<li>信号屏蔽字</li>
+<li>线程私有数据（线程本地存储TLS）</li>
+</ul>
+<p>并且，同一个进程的所有线程共享进程的某些资源</p>
+<ul>
+<li>可执行程序代码</li>
+<li>全局内存：（初始化数据段，未初始化数据段）</li>
+<li>堆内存</li>
+<li>程序栈</li>
+<li>文件描述符</li>
+</ul>
+<p><img src="/home/down/hexo_website/source/_drafts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89/image-20240603224050481.png"></p>
+<h2 id="Pthread-API详细背景"><a href="#Pthread-API详细背景" class="headerlink" title="Pthread API详细背景"></a>Pthread API详细背景</h2><p>有几个概念贯穿整个Pthreads API，下面首先介绍：</p>
+<h3 id="线程数据类型"><a href="#线程数据类型" class="headerlink" title="线程数据类型"></a>线程数据类型</h3><p>Pthreads API 定义了一干数据类型，表 29-1 列出了其中的一部分。后续会对这些数据类型中的绝大部分加以描述。</p>
+<p><img src="/home/down/hexo_website/source/_drafts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89/image-20240603224111058.png" alt="image-20240603224111058"></p>
+<h3 id="线程-errno"><a href="#线程-errno" class="headerlink" title="线程 errno"></a>线程 errno</h3><p>一言以蔽之，errno 机制在保留传统 UNIX API 报错方式的同时，也适应了多线程环境。</p>
+<h3 id="Pthreads-函数返回值"><a href="#Pthreads-函数返回值" class="headerlink" title="Pthreads 函数返回值"></a>Pthreads 函数返回值</h3><p>从系统调用和库函数中返回状态，传统的做法是：返回 0 表示成功，返回-1 表示失败，并设置 errno 以标识错误原因。</p>
+<p>Pthreads API 所有 Pthreads 函数均以返回 0 表示成功，返回一正值表示失败。这一失败时的返回值，与传统 UNIX 系统调用置于 errno 中的值含义相同。</p>
+<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><p>启动程序时，产生的进程只有单条线程，称之为初始（initial）或主（main）线程。</p>
+<p>函数 pthread_create()负责创建一条新线程。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,</span></span></span><br><span class="line"><span class="params"><span class="function">                    <span class="type">void</span> * (*start)(<span class="type">void</span>*),<span class="type">void</span> *args)</span></span>;</span><br><span class="line"><span class="comment">// 成功返回0，错误返回一个正错误号。</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>新</strong>线程通过带有参数（args）的函数start开始执行。<strong>原</strong>线程继续执行后续语句。如果执行的执行函数不需要参数，则可以将args设置为NULL</li>
+<li>start()的返回值类型为 void*，对其使用方式与参数 arg 相同。对后续 <code>pthread_join()</code>函数的描述中，将论及对该返回值的使用方式。</li>
+<li>将经强制转换的整型数作为线程 start 函数的<strong>返回值</strong>时，必须小心谨慎。原因在于，<strong>取消线程（</strong>见第 32 章）时的返回值 PTHREAD_CANCELED，通常是由实现所定义的整型值，再经强制转换为 void*。如果某一线程B恰好返回实现定义此取消值，那么正在执行pthread_join()操作的线程B，会误认为A遭到了取消。</li>
+<li>参数 thread 指向 pthread_t 类型的缓冲区，在 pthread_create()返回前，会在此保存一个该线程的唯一标识。后续的 Pthreads 函数将使用该标识来引用此线程。在新线程开始执行之前，实现无需对 thread 参数所指向的缓冲区进行初始化，即新线程可能会在 pthread_create()返回给调用者之前已经开始运行。如**新线程需要获取自己的线程 ID，则只能使用 pthread_self()**（29.5 节描述）方法。</li>
+<li>参数 attr 是指向 pthread_attr_t 对象的指针，该对象指定了新线程的各种属性。29.8 节将述及其中的部分属性。如果将 attr 设置为 NULL，那么创建新线程时将使用各种默认属性，</li>
+</ul>
+<p><strong>调用 pthread_create()后，应用程序无从确定系统接着会调度哪一个线程来使用 CPU 资源（在多处理器系统中，多个线程可能会在不同 CPU 上同时执行）。</strong></p>
+<h2 id="终止线程"><a href="#终止线程" class="headerlink" title="终止线程"></a>终止线程</h2><p>有如下方式</p>
+<ul>
+<li>执行函数（start）执行return语句，返回指定值</li>
+<li>线程调用<code>pthread_exit()</code><ul>
+<li>调用和执行return类似，不同之处在于，可在线程start函数所调用的任意函数中调用<code>pthread_exit()</code></li>
+<li>retval不应分配在线程栈中，start函数的返回值也不应分配在堆栈中</li>
+<li>如果主线程调用pthread_exit()，而非调用exit()或return，其他线程将继续运行</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">include&lt;pthread.h&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span></span>;</span><br><span class="line"><span class="comment">// 其返回值可由其他线程调用pthread_jion()获得。</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>调用<code>pthread_cancel()</code>取消线程</li>
+<li>任意线程调用了<code>exit()</code>，或主线程执行return，都会导致所有线程立即退出</li>
+</ul>
+<h2 id="线程标识（ID）"><a href="#线程标识（ID）" class="headerlink" title="线程标识（ID）"></a>线程标识（ID）</h2><p>一个线程可以通过<code>pthread_self()</code>获取自己的ID</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">pthread_t</span> <span class="title">pthread_self</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数<code>pthread_equal()</code>可检查两个线程ID是否相同</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">pthread_t</span> <span class="title">pthread_equal</span><span class="params">(<span class="type">pthread_t</span> t1,<span class="type">pthread_t</span> t2)</span></span>;</span><br><span class="line"><span class="comment">// 如果相同返回非0，否则0</span></span><br><span class="line"><span class="comment">// pthread_t是由实现定义的，可移植程序不应依赖它</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="链接（joioning）已终止的线程"><a href="#链接（joioning）已终止的线程" class="headerlink" title="链接（joioning）已终止的线程"></a>链接（joioning）已终止的线程</h2><p>函数<code>pthread_join()</code><strong>等待</strong> 特定ID的已终止线程。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">pthread_t</span> <span class="title">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span></span>;</span><br><span class="line"><span class="comment">// 0成功，失败返回一个正错误号</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>retval保存终止进程的返回值</li>
+</ul>
+<p><strong>pthread_join()执行的功能类似于针对进程的 waitpid()调用，不过二者之间存在一些显著差别。</strong></p>
+<ul>
+<li><strong>线程之间的关系是对等的（peers）</strong>，进程中的任意线程均可以调用 pthread_join()与该进程的任何其他线程连接起来。例如，如果线程 A 创建线程 B，线程 B 再创建线程 C，那么线程 A 可以连接线程 C，线程 C 也可以连接线程 A。这与进程间的层次关系不同，父进程如果使用 fork()创建了子进程，那么它也是唯能够对子进程调用 wait()的进程。调用 pthread_create()创建的新线程与发起调用的线程之间，就没有这样的关系。</li>
+<li>无法“连接任意线程”（对于进程，则可以通过调用 waitpid(-1, &amp;status, options)做到这一点），也不能以非阻塞（nonblocking）方式进行连接（类似于设置 WHOHANG 标志的 waitpid()）。使用条件（condition）变量可以实现类似的功能。</li>
+</ul>
+<h2 id="线程的分离"><a href="#线程的分离" class="headerlink" title="线程的分离"></a>线程的分离</h2><p>有时，程序员并不关心线程的返回状态，只是希望系统在线程终止时能够自动清理并移除之。在这种情况下，可以调用 pthread_detach()并向 thread 参数传入指定线程的标识符，将该线程标记为处于分离（detached）状态。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">pthread_t</span> <span class="title">pthread_detch</span><span class="params">(<span class="type">pthread_t</span> thread)</span></span>;</span><br><span class="line"><span class="comment">// 0成功，失败返回一个正错误号</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>一旦线程处于分离状态，就不能再使用 pthread_join()来获取其状态，也无法使其重返“可连接”状态</li>
+<li>其他线程调用了 exit()，或是主线程执行 return 语句时，即便遭到分离的线程也还是会受到影响。此时，不管线程处于可连接状态还是已分离状态，进程的所有线程会立即终止。换言之，<strong>pthread_detach()只是控制线程终止之后所发生的事情（被自动回收，而不是成为僵尸），而非何时或如何终止线程。</strong></li>
+</ul>
+<h2 id="线程属性"><a href="#线程属性" class="headerlink" title="线程属性"></a>线程属性</h2><p>点出如下之类的一些属性：</p>
+<ul>
+<li>线程栈的位置和大小、</li>
+<li>线程调度策略和优先级（类似于 35.2 节和 35.3<br>  节所描述的进程实时调度策略和优先级），</li>
+<li>以及线程是否处于可连接或分离状态。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%883%EF%BC%89-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -875,7 +1031,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
