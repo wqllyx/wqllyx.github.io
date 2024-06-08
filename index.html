@@ -520,10 +520,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-06-03 12:43:33 / 修改时间：14:06:01" itemprop="dateCreated datePublished" datetime="2024-06-03T12:43:33+08:00">2024-06-03</time>
+              <time title="创建时间：2024-06-03 12:43:33" itemprop="dateCreated datePublished" datetime="2024-06-03T12:43:33+08:00">2024-06-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-06-08 18:12:21" itemprop="dateModified" datetime="2024-06-08T18:12:21+08:00">2024-06-08</time>
+              </span>
 
           
 
@@ -540,7 +546,7 @@
 <p>最终打包成一个动态库供别人使用。</p>
 <h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 建立线程池对象</span></span><br><span class="line">ThreadPool	pool;</span><br><span class="line"><span class="comment">// 选择模式，固定大小或者可变大小</span></span><br><span class="line">pool.<span class="built_in">setMode</span>(<span class="built_in">fixed</span>(<span class="keyword">default</span>) | cached);</span><br><span class="line"><span class="comment">// 启动线程池</span></span><br><span class="line">pool.<span class="built_in">start</span>();</span><br><span class="line"><span class="comment">// 提交任务到线程池,返回任务计算完成的的值（可选的返回值，也可能没有）</span></span><br><span class="line">Result  result = pool.<span class="built_in">submitTask</span>(concreteTask);</span><br><span class="line"><span class="comment">// 获得最终的结果类型</span></span><br><span class="line">result.<span class="built_in">get</span>().Cast&lt;&gt;();</span><br></pre></td></tr></table></figure>
 
-<p><img src="/home/down/B_learn/notes/imgs/image-20240603125437820.png" alt="image-20240603125437820"></p>
+<p><img src="/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%883%EF%BC%89-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/image-20240603125437820.png" alt="image-20240603125437820"></p>
 <p>还需要一个线程容器存放Thread对象。（也是有大小的）</p>
 <p>还需要一个任务容器存放任务对象。（也是有大小的）</p>
 <p>任务容器存放的是任务抽象基类（里面有一个纯虚函数run方法），以便可以存放任何任务。用户需要继承task基类来实现自己的任务。</p>
