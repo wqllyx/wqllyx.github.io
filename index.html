@@ -148,6 +148,198 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/08/TCP-IP%E7%BD%91%E7%BB%9C-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/08/TCP-IP%E7%BD%91%E7%BB%9C-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" class="post-title-link" itemprop="url">TCP/IP网络----基本概念</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-06-08 17:42:02 / 修改时间：17:53:56" itemprop="dateCreated datePublished" datetime="2024-06-08T17:42:02+08:00">2024-06-08</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>体系结构(协议和物理)实际上是一组设计决策,涉及支持哪些特征和在哪里实现这些特征。</p>
+<p>设计一个体系结构更多的是艺术而不是科学,但我们将讨论体系结构中随着时间推移被认为可行的那些特征。</p>
+<h2 id="体系结构（架构）和协议族（实现）"><a href="#体系结构（架构）和协议族（实现）" class="headerlink" title="体系结构（架构）和协议族（实现）"></a>体系结构（架构）和协议族（实现）</h2><h3 id="协议族"><a href="#协议族" class="headerlink" title="协议族"></a>协议族</h3><p>协议的集合</p>
+<h3 id="协议族的体系（架构）结构（或参考模型）"><a href="#协议族的体系（架构）结构（或参考模型）" class="headerlink" title="协议族的体系（架构）结构（或参考模型）"></a>协议族的体系（架构）结构（或参考模型）</h3><ul>
+<li><p>指定协议族中的各种协议之间的相互关系</p>
+</li>
+<li><p>分工各层协议要完成的任务</p>
+</li>
+</ul>
+<h3 id="体系结构（架构）举例"><a href="#体系结构（架构）举例" class="headerlink" title="体系结构（架构）举例"></a>体系结构（架构）举例</h3><ul>
+<li>ISO体系结构（并不是互联网的体系结构）<ul>
+<li>内容：七层体系结构，规定了每层之间的关系及其任务</li>
+</ul>
+</li>
+<li>Internet（当今互联网体系结构）体系结构<ul>
+<li>内容：4层体系结构，规定了每层之间的关系及其任务。</li>
+</ul>
+</li>
+</ul>
+<h3 id="体系结构的实现"><a href="#体系结构的实现" class="headerlink" title="体系结构的实现"></a>体系结构的实现</h3><p>满足体系结构的要求。就叫他的实现</p>
+<ul>
+<li>TCP&#x2F;IP实现Internet体系结构。</li>
+</ul>
+<p><strong>实现方式</strong>：</p>
+<p>按照体系结构的层次，也分层实现各个协议的任务。及其交互关系。</p>
+<h3 id="各层之间的交互方式（通信方式）"><a href="#各层之间的交互方式（通信方式）" class="headerlink" title="各层之间的交互方式（通信方式）"></a>各层之间的交互方式（通信方式）</h3><ul>
+<li><p>本层实现自己的协议（自己所要完成的功能）</p>
+</li>
+<li><p>下层利用本层实现的功能（协议）向上层提供服务。</p>
+</li>
+</ul>
+<h2 id="体系结构原则（通用体系结构，不涉及具体的）"><a href="#体系结构原则（通用体系结构，不涉及具体的）" class="headerlink" title="体系结构原则（通用体系结构，不涉及具体的）"></a>体系结构原则（通用体系结构，不涉及具体的）</h2><p>Intemet体系结构在几个<code>目标</code>的指导下建立。</p>
+<p><strong>首要目标：</strong></p>
+<p>体系结构应将多种网络互联起来,并在互联的网络上同时运行多个应用。</p>
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><p>数据分完组之后，随便你怎么独立传输。</p>
+<p>在分组交换中,包含一定字节数的数字信息“块”(分组)独立通过网络。</p>
+<p>来自不同来源或发送方的块可以组合,而且以后可以分解,这称为“(多路)复用”。</p>
+<p>这些块在到达目的地的过程中,需要在交换设备之间传输,并且路径可以改变。</p>
+<h3 id="面向连接的协议（服务）"><a href="#面向连接的协议（服务）" class="headerlink" title="面向连接的协议（服务）"></a>面向连接的协议（服务）</h3><p>通信之前要建立一条连接（不论是逻辑还是物理上的）</p>
+<p>需要为每个连接存储一些信息或状态。</p>
+<h3 id="数据报"><a href="#数据报" class="headerlink" title="数据报"></a>数据报</h3><p>所有通信信息都包含在自己的分组中，不需要外物帮助自己存储必要信息。</p>
+<p>它是一个特定类型的分组,有关来源和最终目的地的所有识别信息都位于分组中(而不是分组交换机中)。虽然这通常需要较大的数据包,但不需要在交换机中维护连接状态,它可用于建立一个无连接的网络。</p>
+<h3 id="消息边界（记录标记）"><a href="#消息边界（记录标记）" class="headerlink" title="消息边界（记录标记）"></a>消息边界（记录标记）</h3><p>保留消息边界的协议：发送的什么消息，就原封不动的接受什么</p>
+<p>不保留的：发送的A消息，有可能仅仅就被解释一个个字节接受。</p>
+<p>比如：发送3个组，<code>我123</code>、<code>你456</code>、<code>他789</code></p>
+<ul>
+<li>保留的：接受：也是带边界的三个组。</li>
+<li>不保留的：仅仅是字节序列。</li>
+</ul>
+<p><img src="/TCP-IP%E7%BD%91%E7%BB%9C-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20240608164146156.png" alt="image-20240608164146156"></p>
+<h3 id="端到端论点和命运共享"><a href="#端到端论点和命运共享" class="headerlink" title="端到端论点和命运共享"></a>端到端论点和命运共享</h3><p>端到端论点:</p>
+<p><code>重要功能尽量在端系统实现</code></p>
+<p><strong>重要功能(例如差错控制、加密、交付确认)通常不会在大型系统的低层(见1.2.1节)实现</strong>。但是,低层可以提供方便端系统工作的功能,并最终可能改善性能。这种观点表明低层功能不应以完美为目标,这是因为对应用程序需求做出完美推测是不可能的。</p>
+<p>命运共享：</p>
+<p><code>选择哪些功能</code>在同一计算机、网络或软件栈中实现。</p>
+<h3 id="差错控制和流量控制"><a href="#差错控制和流量控制" class="headerlink" title="差错控制和流量控制"></a>差错控制和流量控制</h3><ul>
+<li><p>在网络中存在数据损坏或丢失的情况。这可能出于各种原因,例如硬件间题、数据传输中被修改、在无线网络中超出范围,以及其他因素。<strong>对这种错误的处理称为差错控制,</strong></p>
+</li>
+<li><p>针对网络中可靠、按顺序交付的实现<strong>开销，</strong>Intemet协议采用一种称为<strong>尽力而为交付的服务</strong>：</p>
+<ul>
+<li>那些可能影响一个数据报定向的差错,当检测到这种差错时,出错的数据报仅被丢弃而没有进一步行动。</li>
+</ul>
+</li>
+<li><p>如果尽力而为的交付成功,发送方能以超过接收方处理能力的速度生成信息。在尽力而为的IP网络中,降低发送方的发送速度可通过<strong>流量控制机制</strong>实现,它在网络外部或通信系统高层中运行。</p>
+<ul>
+<li>注意,TCP会处理这种问题,这与端到端论点一致：TCP在端主机中实现速率控制。</li>
+<li>它也与命运共享一致:这种方案在网络基础设施中有些单元失效的情况下,不会影响网络设备的通信能力(只要有些通信路径仍然可用)。</li>
+</ul>
+</li>
+</ul>
+<h2 id="设计和实现"><a href="#设计和实现" class="headerlink" title="设计和实现"></a>设计和实现</h2><p>一个体系结构并不是只有一个唯一实现（如果是这样的话，那就不用区分结构和实现了），所以体系结构和实现并不是相同的概念。</p>
+<p><strong>实现体系结构定义了协议体系结构中的概念如何用于软件形式的实现中。</strong></p>
+<p><strong>但实现一般是分层的</strong></p>
+<h3 id="分层"><a href="#分层" class="headerlink" title="分层"></a>分层</h3><p>通过分层,每层只负责通信的一个方面。</p>
+<ul>
+<li>ISO体系结构（并不是互联网的体系结构）<ul>
+<li>内容：七层体系结构，规定了每层之间的关系及其任务</li>
+</ul>
+</li>
+<li>Internet（当今互联网体系结构）体系结构<ul>
+<li>内容：4层体系结构，规定了每层之间的关系及其任务。</li>
+</ul>
+</li>
+</ul>
+<h3 id="分层实现中的复用、分解、和封装"><a href="#分层实现中的复用、分解、和封装" class="headerlink" title="分层实现中的复用、分解、和封装"></a>分层实现中的复用、分解、和封装</h3><ul>
+<li>分层体系结构的一个主要优点是具有<strong>协议复用</strong>的能力：</li>
+</ul>
+<p>第N层的<code>协议数据单元(PDU)</code>可以通过N-1层的<strong>封装</strong>而复用。。第N-1层的协议<code>数据单元(PDU)</code>在第N层的<strong>分解</strong>过程中用于接受原数据。</p>
+<ul>
+<li>也允许相同协议对象(例如连接)的多个实例同时存在,并且不会被混淆。</li>
+</ul>
+<p>A层的协议有的概念，B层也可以有，都用到了这个概念实现协议，但他们因为是不同层，所以是不同的。</p>
+<p><img src="/TCP-IP%E7%BD%91%E7%BB%9C-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20240608170837936.png" alt="image-20240608170837936"></p>
+<h2 id="TCP-lP-体系结构和协议（具体的体系结构-因特网的事实标准）"><a href="#TCP-lP-体系结构和协议（具体的体系结构-因特网的事实标准）" class="headerlink" title="TCP&#x2F;lP 体系结构和协议（具体的体系结构&#x2F;因特网的事实标准）"></a>TCP&#x2F;lP 体系结构和协议（具体的体系结构&#x2F;因特网的事实标准）</h2><h3 id="TCP-IP-参考模型"><a href="#TCP-IP-参考模型" class="headerlink" title="TCP&#x2F; IP 参考模型"></a>TCP&#x2F; IP 参考模型</h3><ul>
+<li><p>应用层</p>
+</li>
+<li><p>传输层(TCP&#x2F;UDP)</p>
+</li>
+<li><p>网络层（IP&#x2F;Intemet控制消息协议(ICMP)是IP的一个辅助协议）</p>
+<ul>
+<li>IP发送给链路层协议的PDU称为<code>IP数据报</code>,它的大小是64KB(IPv6将它扩大为4GB)。</li>
+<li>大的分组放人链路层PDU(称为<code>帧</code>)时需要进行缩小处理,这个过程称为<code>分片</code>,它通常由IP<code>主机</code>和某些<code>路由器</code>在必要时执行。</li>
+<li>在分片的过程中,大数据报的一部分被放人多个称为分片的小数据报中,并在到达目的地后组合(称为重组)</li>
+</ul>
+<p>  **3种类型的IP地址,**地址类型决定如何进行转发:</p>
+<ul>
+<li><p>单播(目的地是一台主机)、</p>
+</li>
+<li><p>广播(目的地是一个指定网络中的所有主机)和</p>
+</li>
+<li><p>组播(目的地是属于一个组播组中的一组主机)。</p>
+</li>
+</ul>
+</li>
+<li><p>链路层（ARP）</p>
+</li>
+</ul>
+<h3 id="TcP-lP中的复用、分解和封装"><a href="#TcP-lP中的复用、分解和封装" class="headerlink" title="TcP&#x2F;lP中的复用、分解和封装"></a>TcP&#x2F;lP中的复用、分解和封装</h3><p>每层都会有一个<strong>标识符（ID）</strong>,允许接收方决定哪些协议或数据流可复用在一起。每层通常也有<strong>地址信息</strong>,它用于保证一个PDU被交付到正确的地方。</p>
+<p><img src="/TCP-IP%E7%BD%91%E7%BB%9C-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/image-20240608172112003.png" alt="image-20240608172112003"></p>
+<p>虽然它不是TCP&#x2F;IP协议族的真实部分,但我们也能自底向上地说明从<code>链路层</code>开始如何进行分解,这里使用以太网作为例子。</p>
+<ul>
+<li><code>链路层</code>以太网帧包含一个48位的目的地址(介质访问控制(MAC)地址)和一个16位的以太网类型字段00x0800表示这个帧包含IPv4数据报，0x0806和0x86DD分别表示ARP和IPv6，假设目的地址与接收方的一个地址匹配,这个帧将被接收并校验差错,以太网<strong>类型（type）</strong>字段用于选择处理它的<code>网络层协议</code>。如果接收到的帧包含一个IP数据报,以太网头部和尾部信息将被清除,并将剩余字节(包含帧的有效载荷)交给IP来处理。</li>
+<li>IP检测一系列的字段,包括数据报中的目的地址。如果目的地址与自已的一个IP地址匹配,并且数据报头部(IP不检测有效载荷)没有错误,则检测8位的IPv4协议字段(在IPv6中称为下一个头部字段),以决定接下来调用哪个协议来处理。常见的值包括1(ICMP)、2(IGMP)、4(IPv4)、6(TCP)和17(UDP)。<strong>数值4的含义是有趣的：因为它表示一个IP数据报可能出现在另一个IP数据报的有效载荷中。</strong>它违反了分层和封装的原有概念,但是作为<code>隧道</code>技术的基础。如果网络层(IPv4或IPv6)认为传人的数据报有效,并且已确定正确的<code>传输层协议</code>,则将数据报(必要时由分片重组而成)交给传输层处理。</li>
+<li>传输层中,大部分协议(包括TCP和UDP)通过<code>端口号</code>将复用分解到适当的应用。</li>
+</ul>
+<h3 id="端口号"><a href="#端口号" class="headerlink" title="端口号"></a>端口号</h3><p><strong>端口号是16位的非负整数(范围是0-65535)。这些数字是抽象的,在物理上没有指任何东西。</strong></p>
+<p>在某些情况下(例如在客户端),端口号的值无关紧要,这是因为它们只是短期被使用。这些端口号又称为临时端口号。它们被认为是临时的,因为客户机只需支持一个应用的客户程序,并不需要被服务器发现以建立一个连接。相反,服务器通常需要不变的名称和端口号,以便被客户机所发现。</p>
+<h3 id="名称（name）、地址和DNS"><a href="#名称（name）、地址和DNS" class="headerlink" title="名称（name）、地址和DNS"></a>名称（name）、地址和DNS</h3><p>在TCP&#x2F;IP中,每台计算机(包括路由器)的每个链路层接口至少有一个IP地址。IP地址足以识别主机,但它们不方便被人们记忆或操作(尤其是更长的IPv6地址)。在TCP&#x2F;IP环境中,DNS是一个分布式数据库,提供主机名和IP地址之间的映射(反之亦然)。</p>
+<p>虽然大多数TCP&#x2F;IP协议不必关心域名,但用户(例如使用Web测览器)通常会频繁使用域名,因此如果DNS不能正常工作,正常的Intemet访问也难以使用。</p>
+<h2 id="Internet、内联网和外联网"><a href="#Internet、内联网和外联网" class="headerlink" title="Internet、内联网和外联网"></a>Internet、内联网和外联网</h2><p><strong>内联网</strong>是一个用于描述专用互联网络的术语。</p>
+<p>在很多情况下,一个企业或商业机构可能希望建立一个网络,其中包含可供合作伙伴或其他相关公司通Intemet访问的服务器。这种涉及<code>VPN</code>的网络通常被称为<strong>外联网</strong>,由连接在提供服务的企业防火墙之外的计算机组成(见第7章)</p>
+<h2 id="设计应用（程序）"><a href="#设计应用（程序）" class="headerlink" title="设计应用（程序）"></a>设计应用（程序）</h2><p>网络应用的典型结构基于少数几种模式。</p>
+<p>最常见的模式是<strong>客户机&#x2F;服务器模式和对等模式</strong></p>
+<h3 id="CS模式"><a href="#CS模式" class="headerlink" title="CS模式"></a>CS模式</h3><h3 id="P2P模式"><a href="#P2P模式" class="headerlink" title="P2P模式"></a>P2P模式</h3><h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><p>无论是P2P或客户机&#x2F;服务器,都需要表述其所需的网络操作(例如建立一个连接、写人或读取数据)。这通常由主机<strong>操作系统</strong>使用一个网络应用程序编程接口(API)来实现。最流行的API被称为套接字或Berkeley套接字。</p>
+<h2 id="网络安全"><a href="#网络安全" class="headerlink" title="网络安全"></a>网络安全</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1032,7 +1224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
