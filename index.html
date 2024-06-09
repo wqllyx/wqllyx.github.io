@@ -148,6 +148,140 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">TCP-IP网络----网络层（数据平面2）路由器结构</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-09 17:06:21" itemprop="dateCreated datePublished" datetime="2024-06-09T17:06:21+08:00">2024-06-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="路由器结构"><a href="#路由器结构" class="headerlink" title="路由器结构"></a>路由器结构</h1><p>已经概述了网络层内的数据和控制平面、转发和路由之间的重要区别以及网络层的服务和功能。</p>
+<p>我们将注意力转向<strong>网络层的转发功能</strong>——数据包从路由器的传入链路到该路由器相应的传出链路的实际传输。</p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/image-20240609154639090.png" alt="image-20240609154639090"></p>
+<p>图 4.4 显示了通用路由器架构的高级视图。可以识别四个路由器组件：</p>
+<ol>
+<li><strong>输入端口</strong>：输入端口执行几个关键功能。<ol>
+<li><code>perform the physical layer function of terminating an incoming physical link at a router</code>。这显示在图4.4中输入端口的最左侧框和输出端口的最右边框。</li>
+<li><code>also perform link-layer functions needed to interoperate with the link layer at the other side of the incoming link</code>。这由输入和输出端口中的中间框表示。</li>
+<li><code>a lookup function is also performed at the input port</code>这将发生在输入端口的最右边框中。在这里，<strong>查询转发表</strong>以确定到达的数据包将通过交换结构转发到路由器的哪个输出端口。<strong>控制数据包</strong>（例如，携带路由协议信息的数据包）<strong>从输入端口转发到路由处理器</strong></li>
+<li>请注意，这里的“端口”一词 - 引入物理输入和输出路由器接口 - 与第2章和第3章中讨论的与网络应用程序和socket相关的软件端口明显不同。</li>
+</ol>
+</li>
+<li><strong>交换结构</strong>：交换结构将路由器的输入端口连接到其输出端口。此交换结构完全包含在路由器内——网络路由器内的网络</li>
+<li><strong>输出端口：</strong></li>
+<li><strong>路由处理器：</strong></li>
+</ol>
+<p><strong>路由器的输入端口、输出端口和交换结构几乎总是以硬件实现，如图 4.4 所示。（在下层）</strong></p>
+<p><strong>因为软件跟不上速度。</strong></p>
+<p><code>要理解为什么需要硬件实现，请考虑使用 100 Gbps 输入链路和 64 字节 IP 数据报，输入端口只有 5.12 纳秒的时间来处理数据报，然后另一个数据报才会到达。如果 N 个端口组合在线卡上（实践中经常这样做），数据报处理管道必须以 N 倍的速度运行——对于软件实现来说太快了</code></p>
+<p>当<code>数据平面以纳秒时间尺度运行时</code>，路由器的<code>控制功能（执行路由协议、响应向上或向下的附加链路、与远程控制器通信（在 SDN 情况下）以及执行管理功能）运行在毫秒或秒的时间尺度上</code>。</p>
+<p>因此，这些<strong>控制平面功能通常以软件实现</strong>并在<code>路由处理器</code>（通常是传统 CPU）上执行。</p>
+<p><code>在深入研究路由器内部细节之前，让我们回到本章开头的类比，其中将数据包转发与进入和离开立交桥的汽车进行比较。假设立交桥是一个环岛，当汽车进入环岛时，需要进行一些处理。让我们考虑一下此处理需要哪些信息:</code></p>
+<p><code>基于目的地的转发。假设汽车停在入口站并指示其最终目的地（不是当地的环岛，而是其旅程的最终目的地）。入口站的工作人员会查找最终目的地，确定通往最终目的地的环岛出口，并告诉司机要走哪个环岛出口。</code></p>
+<p><code>通用转发。除了目的地之外，乘务员还可以根据许多其他因素来确定汽车的出口坡道。例如，所选的出口坡道可能取决于汽车的来源，例如颁发汽车牌照的州。来自某一组州的汽车可能会被指示使用一个出口坡道（通过慢速道路通向目的地），而来自其他州的汽车可能会被指示使用不同的出口坡道（通过超级道路通向目的地）高速公路）。可能会根据汽车的型号、品牌和年份做出相同的决定。或者，一辆不适合上路的汽车可能会被封锁，不被允许通过环岛。在通用转发的情况下，许多因素都可能影响乘务员为给定汽车选择出口坡道</code></p>
+<p><code>一旦车辆进入环岛（其中可能挤满了从其他输入道路进入并前往其他环岛出口的其他车辆），它最终会在规定的环岛出口坡道处离开，在那里它可能会遇到在该出口离开环岛的其他车辆。通过这个类比，我们可以很容易地识别出图 4.4 中的主要路由器组件——入口道路和入口站对应于输入端口（具有查找功能以确定本地输出端口）；环岛对应于交换结构；环岛出口道路对应输出口。通过这个类比，考虑瓶颈可能出现在哪里是有启发性的。如果汽车到达速度极快（例如，环岛在德国或意大利！）但车站服务员却很慢，会发生什么？服务员必须以多快的速度工作才能确保入口道路上没有后援？即使有速度极快的服务员，如果汽车缓慢地穿过环岛——还能进行倒车吗？如果进入环岛所有入口坡道的大多数车辆都想在同一个出口坡道离开环岛，会发生什么情况——可以在出口坡道或其他地方进行备份吗？如果我们想为不同的车辆分配优先级，或者首先阻止某些车辆进入环岛，那么环岛应该如何运行？这些都类似于路由器和交换机设计人员面临的关键问题。</code></p>
+<p>为了具体和简单起见，我们最初在本节中假设转发决策仅<strong>基于数据包的目标地址</strong>，而不是基于一组<strong>通用的数据包标头字段</strong>。</p>
+<p>我们将在 4.4 节中介绍更<strong>广义的数据包转发情况</strong></p>
+<h2 id="输入端口处理和基于目的地的转发"><a href="#输入端口处理和基于目的地的转发" class="headerlink" title="输入端口处理和基于目的地的转发"></a>输入端口处理和基于目的地的转发</h2><p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/image-20240609160152331.png" alt="image-20240609160152331"></p>
+<p>输入处理的更详细视图如图 4.5 所示。</p>
+<p>正如刚才所讨论的，输入端口的线路终止功能和链路层处理实现了各个输入链路的物理层和链路层。</p>
+<p>在输入端口中执行的<strong>查找是路由器操作的核心</strong>——路由器在这里使用转发表来查找输出端口，到达的数据包将通过<code>交换结构</code>转发到该输出端口。</p>
+<p>转发表要么由路由处理器计算和更新（使用路由协议与其他网络路由器中的路由处理器交互），要么从远程 SDN 控制器接收。</p>
+<p>转发表通过单独的总线（例如 PCI 总线）从<code>路由处理器</code>复制到<strong>线卡</strong>，如图 4.4 中从路由处理器到输入线卡的虚线所示。</p>
+<p>通过每个线卡上的<strong>副本</strong>，可以在每个输入端口<strong>本地</strong>做出转发决策，而无需针对每个数据包调用<strong>集中式路由</strong>处理器，从而避免集中式处理瓶颈。</p>
+<p>现在让我们考虑“最简单”的情况，即传入数据包要交换到的输出端口基于数据包的目标地址。</p>
+<p>对于 32 位 IP 地址，转发表的暴力解法将为每个可能的目标地址都有一个条目。由于可能的地址超过 40 亿个，因此该选项完全不可能。</p>
+<p><strong>实际做法是：</strong></p>
+<p>将IP地址划分范围，每个范围指定一个转发端口。然后使用最长前缀匹配算法，匹配最合适的范围，如果全部都没匹配，则走默认端口。（有点像switch）</p>
+<p>而不是每个Ip地址都对应一个端口号。</p>
+<ul>
+<li><p>有了转发表，查找在概念上很简单——硬件逻辑只是搜索转发表以查找最长的前缀匹配。但在千兆位传输速率下，此查找必须在纳秒内完成（所以查找的复杂度也不能太高））。</p>
+</li>
+<li><p>一旦通过<code>查找</code>确定了数据包的<code>输出端口</code>，就可以将数据包发送到<code>交换结构中</code>。在某些设计中，如果来自其他输入端口的数据包当前正在使用<code>交换结构</code>，则可能会暂时<code>阻止</code>数据包进入交换结构。被阻止的数据包将在<code>输入端口排队</code>，然后安排在稍后的时间点穿过<code>交换结构</code>。</p>
+</li>
+<li><p><code>输入端口除了查找，还要采取许多其他操作</code>：</p>
+<ul>
+<li>必须进行物理层和链路层处理，如前所述； </li>
+<li>必须检查数据包的版本号、校验和和生存时间字段并重写后两个字段；</li>
+<li>用于网络管理的计数器（例如接收到的IP数据报的数量）必须更新。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>查找目标 IP 地址（“匹配”）然后将数据包发送到交换结构再到指定输出端口（“操作”）的输入端口步骤是更一般的“匹配加操作”抽象的特定情况，即在许多联网设备中执行，而不仅仅是路由器。</strong></p>
+</blockquote>
+<p>在链路层交换机（第 6 章中介绍）中，查找链路层目标地址，并且除了将帧发送到交换结构并朝向输出端口之外，还可以采取多种操作。</p>
+<p>在防火墙（第 8 章介绍）中（过滤选定的传入数据包的设备），如果传入数据包的报头符合给定的标准（例如，源&#x2F;目标 IP 地址和传输层端口号的组合），则可能会被丢。</p>
+<p>在网络地址转换器（NAT，第 4.3 节中介绍）中，传输层端口号与给定值匹配的传入数据包将在转发（操作）之前重写其端口号。</p>
+<p>事实上， <strong>the “match plus action” abstraction</strong>在当今的<strong>网络设备</strong>中既强大又普遍，并且是<strong>广义转发概念的核心。</strong></p>
+<h2 id="交换（结构）"><a href="#交换（结构）" class="headerlink" title="交换（结构）"></a>交换（结构）</h2><p><code>交换结构</code>是路由器的核心，因为数据包实际上是通过该结构<code>从输入端口交换（即转发）到输出端口的</code>。交换可以通过多种方式完成，如图4.6所示：</p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/image-20240609163429174.png" alt="image-20240609163429174"></p>
+<ul>
+<li><strong>通过内存交换：</strong>最简单、最早的路由器是传统计算机，输入和输出端口之间的交换是在 CPU（<code>路由处理器</code>）的直接控制下完成的。输入和输出端口在传统操作系统中充当传统I&#x2F;O设备。输入端口首先通过中断向路由处理器发出信号。然后，数据包从输入端口复制到处理器内存中。然后，路由处理器从报头中提取目标地址，在转发表中查找适当的输出端口，并将数据包复制到输出端口的缓冲区。在这种情况下，如果内存带宽使得每秒最多可以将 B 个数据包写入内存或从内存中读取，则总体转发吞吐量（数据包从输入端口传输到输出端口的总速率）端口）一定小于 B&#x2F;2。<strong>两个数据包不能同时转发，即使他们有不同的目的端口。因为共享系统总线一次只能执行一次内存读&#x2F;写操作</strong>。一些现代路由器通过内存进行切换。然而，与早期路由器的主要区别在于，<code>目标地址的查找以及将数据包存储到适当的内存位置是通过对输入线卡进行处理来执行的</code>。在某些方面，通过内存进行交换的路由器看起来非常像共享内存多处理器，通过线卡上的处理将数据包交换（写入）到适当输出端口的内存中。</li>
+<li><strong>通过总线交换</strong></li>
+<li><strong>通过互联网交换</strong></li>
+</ul>
+<h2 id="输出端口处理"><a href="#输出端口处理" class="headerlink" title="输出端口处理"></a>输出端口处理</h2><p>如图4.7所示的输出端口处理，采用已存储在输出端口内存中的数据包，并通过输出链接传输它们。这包括选择（即调度）和用于传输的出队数据包，并执行所需的链路层和物理层传输功能。</p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A22%EF%BC%89%E8%B7%AF%E7%94%B1%E5%99%A8%E7%BB%93%E6%9E%84/image-20240609165747703.png" alt="image-20240609165747703"></p>
+<h2 id="排队在哪发生"><a href="#排队在哪发生" class="headerlink" title="排队在哪发生"></a>排队在哪发生</h2><p>如果我们考虑<code>输入和输出端口功能</code>以及图 4.6 中所示的配置，很明显，数据包队列可能在输入端口和输出端口处形成，就像我们识别出汽车可能在输入和输出处等待的情况一样。</p>
+<p>现在让我们更详细地考虑这些队列，因为随着这些队列变大，路由器的内存最终可能会耗尽，并且当没有内存可用于存储到达的数据包时，就会发生数据包丢失。回想一下，在我们之前的讨论中，我们说过数据包“在网络内丢失”或“在路由器处丢失”。正是在这里，在路由器内的这些队列中，这些数据包实际上被扔掉和丢失。</p>
+<h2 id="数据包调度"><a href="#数据包调度" class="headerlink" title="数据包调度"></a>数据包调度</h2><p>现在让我们回到确定排队数据包通过传出链路传输的顺序的问题。由于您自己无疑曾多次排长队等待并观察如何为等待的客户提供服务，因此您无疑熟悉路由器中常用的许多排队规则。先来先服务（FCFS，也称为先进先出，FIFO）。英国人以在公交车站和市场上耐心有序的 FCFS 排队而闻名（“哦，你在排队吗？”）。其他国家&#x2F;地区以优先权为基础，一类等待的客户比其他等待的客户获得优先服务。还有循环排队，顾客再次被分为不同的类别（如优先级排队），但每个类别的顾客依次获得服务。</p>
+<ul>
+<li>先进先出</li>
+<li>优先级</li>
+<li>循环和赋予权重</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>计算机网络-自顶向下方法 8th</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1361,7 +1495,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
