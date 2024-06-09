@@ -148,6 +148,143 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/" class="post-title-link" itemprop="url">TCP-IP网络----网络层（数据平面）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-06-09 15:38:51 / 修改时间：15:39:56" itemprop="dateCreated datePublished" datetime="2024-06-09T15:38:51+08:00">2024-06-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="网络层（数据平面）"><a href="#网络层（数据平面）" class="headerlink" title="网络层（数据平面）"></a>网络层（数据平面）</h1><p><code>现在提供网络层的概述，我们将在本章的以下部分中介绍网络层的数据平面组件。</code></p>
+<p><code>在4.2节中，我们将深入研究路由器的内部硬件操作，包括输入和输出数据包处理、路由器的内部交换机制以及数据包排队和调度。</code></p>
+<p><code>在 4.3 节中，我们将了解传统的 IP 转发，其中数据包根据其目标 IP 地址转发到输出端口。我们将遇到 IP 寻址、著名的 IPv4 和 IPv6 协议等等。</code></p>
+<p><code>在第 4.4 节中，我们将介绍更广义的转发，其中数据包可以基于大量标头值（即，不仅基于目标 IP 地址）转发到输出端口。数据包可能会在路由器处被阻止或重复，或者可能会重写某些标头字段值——所有这些都在软件控制下。这种更通用的数据包转发形式是现代网络数据平面的关键组成部分，包括软件定义网络 (SDN) 中的数据平面。</code></p>
+<p><code>在 4.5 节中，我们将了解“中间盒(middleboxes)”，它除了转发之外还可以执行其他功能</code></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>网络层分解为两个相互作用的部分：</p>
+<ul>
+<li>数据平面—-网络层中每个路由器的功能<ul>
+<li>确定到达路由器输入链路之一的数据报【datagram】如何<strong>转发</strong>到该路由器的输出链路之一。</li>
+</ul>
+</li>
+<li>控制平面—-<ul>
+<li>控制 数据报如何在 源主机和目的主机之间的路由器之间<strong>路由</strong>。</li>
+</ul>
+</li>
+</ul>
+<p>以前，这些控制平面<strong>路由协议</strong>和数据平面<strong>转发功能</strong>是在路由器内一起<strong>整体</strong>实现的。</p>
+<p>软件定义网络（SDN）通过将这些控制平面功能实现为<strong>单独</strong>的服务（通常在远程“控制器”中）来明确分离数据平面和控制平面。</p>
+<p>每个路由器的主要数据平面作用是将数据报从其输入链路转发到其输出链路；网络控制平面的主要作用是<code>协调每个路由器的转发行为</code>，<code>以便</code>数据报最终沿着源主机和目标主机之间的路由器路径进行端到端传输。</p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/image-20240609145545610.png" alt="image-20240609145545610"></p>
+<h3 id="转发和路由：数据平面和控制平面"><a href="#转发和路由：数据平面和控制平面" class="headerlink" title="转发和路由：数据平面和控制平面"></a>转发和路由：数据平面和控制平面</h3><p>网络层的主要作用——将数据包从发送主机移动到接收主机。</p>
+<p>为此，可以确定两个重要的网络层功能：</p>
+<ol>
+<li><p><strong>转发</strong>：<em>当数据包到达路由器的输入链路时，路由器必须将数据包移动到适当的输出链路</em>。例如，上图 中从主机 H1 到达路由器 R1 的数据包必须转发到通往 H2 的路径上的下一个路由器。转发仅仅是数据平面中的一个函数。</p>
+</li>
+<li><p><strong>路由</strong>：<em>网络层必须确定数据包从发送方流向接收方时所采用的路由或路径。</em>计算这些路径的算法称为<strong>路由算法</strong>。例如，路由算法将确定数据包从图中的 H1 流向 H2 的路径。路由是在网络层的控制平面中实现的。</p>
+</li>
+</ol>
+<p>我们将在本书中更准确地使用这些术语。</p>
+<p><strong>转发</strong></p>
+<ul>
+<li>是指将数据包从输入链路接口传输到适当的输出链路接口的路由器本地操作。</li>
+<li>转发发生在非常短的时间尺度（通常为几纳秒），因此通常在硬件中实现。</li>
+</ul>
+<p><strong>路由</strong></p>
+<ul>
+<li>是指确定数据包从源到目的地所采用的端到端路径的过程。</li>
+<li>路由发生在更长的时间尺度（通常是几秒），通常是在软件中实现的。</li>
+</ul>
+<p><code>使用我们的驾驶类比，考虑我们的旅行者从宾夕法尼亚州到佛罗里达州的旅行。在这次旅行中，我们的司机在前往佛罗里达州的途中经过了许多交汇处。我们可以将转发视为通过单个立交桥的过程：一辆汽车从一条道路进入立交桥，并确定应该走哪条路离开立交桥。我们可以将路由视为规划从宾夕法尼亚州到佛罗里达州的行程的过程：在出发之前，驾驶员查阅了地图并选择了许多可能的路径之一，每条路径都由一系列在交汇处连接的路段组成。</code></p>
+<p>每个路由器的一个关键元素是其<strong>转发表</strong>。路由器通过检查到达数据包头部（首部）中的一个或多个字段的值来转发数据包，然后使用这些头部值<strong>索引</strong>其转发表。存储在转发表条目中的值指示该数据包要转发到的该路由器的哪一个传链路接口。</p>
+<p><code>例如，在图 4.2 中，头字段值为 0110 的数据包到达路由器。路由器索引其转发表并确定该数据包的输出链路接口是接口 2。然后路由器在内部将数据包转发到接口 2。</code></p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/image-20240609150753392.png" alt="image-20240609150753392"></p>
+<p>转发是网络层<strong>数据平面</strong>功能执行的关键功能。</p>
+<h3 id="控制平面：传统方法"><a href="#控制平面：传统方法" class="headerlink" title="控制平面：传统方法"></a>控制平面：传统方法</h3><p>路由器的<strong>转发表是如何配置的</strong>。这是一个至关重要的问题，它揭示了转发（在数据平面中）和路由（在控制平面中）之间的重要相互作用。</p>
+<ul>
+<li>如图4.2：<strong>路由算法决定路由器转发表的内容</strong></li>
+</ul>
+<p>在此示例中，路由算法在每个路由器中运行，并且转发和路由功能<strong>都包含在</strong>路由器内。</p>
+<p>一<strong>台路由器中的路由算法函数与其他路由器中的路由算法函数进行通信，以计算其转发表的值。</strong></p>
+<p>这种通信是如何进行的？</p>
+<ul>
+<li>通过根据路由协议交换包含路由信息的路由消息！<code>路由算法和协议。</code></li>
+</ul>
+<p><code>转发和路由的不同目的可以通过考虑假设的（不现实的，但技术上可行的）网络情景来进一步说明，其中所有转发表均由物理上存在于路由器处的人类网络操作员直接配置。在这种情景下，不需要路由协议！当然，操作员需要相互交互，以确保转发表的配置方式使数据包能够到达其预期目的地。</code></p>
+<h3 id="控制平面：SDN（软件定义网络）-方法"><a href="#控制平面：SDN（软件定义网络）-方法" class="headerlink" title="控制平面：SDN（软件定义网络） 方法"></a>控制平面：SDN（软件定义网络） 方法</h3><p>实现<strong>路由功能</strong>的方法（每个路由器都有一个与其他路由器的路由组件通信的路由组件）一直是路由供应商采用的<strong>传统方法</strong>。</p>
+<p><img src="/2024/06/09/TCP-IP%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82%EF%BC%88%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A21%EF%BC%89/image-20240609152558588.png" alt="image-20240609152558588"></p>
+<p>图 4.3 显示了另一种方法，其中物理上独立的远程控制器<code>计算并分发转发表</code>以供每个路由器使用。</p>
+<p>图 4.2 和 4.3 的<code>数据平面</code>组件是相同的。但是，控制平面路由功能与物理路由器是分开的——<code>路由设备仅执行转发，而远程控制器计算和分发转发表</code></p>
+<p><code>远程控制器</code>可能在具有高可靠性和冗余性的远程数据中心中实现，并且可能由ISP或某些第三方管理。</p>
+<p><strong>路由器和遥控器如何通信？</strong></p>
+<ul>
+<li>通过交换包含转发表和其他路由信息的消息。</li>
+</ul>
+<p>图 4.3 所示的控制平面方法是软件定义网络 (SDN) 的核心，其中网络是“软件定义的”，因为计算转发表并与路由器交互的控制器是在软件中实现的。</p>
+<h2 id="Internet（网络层）服务模型"><a href="#Internet（网络层）服务模型" class="headerlink" title="Internet（网络层）服务模型"></a>Internet（网络层）服务模型</h2><p>在深入研究网络层的数据平面之前，让我们以更广泛的视角来总结我们的介绍，并考虑网络层可能提供的不同类型的服务。</p>
+<ul>
+<li>当发送主机的传输层将数据包传输到网络中（即，将其向下传递到发送主机的网络层）时，传输层是否可以依赖网络层将数据包传送到目的地？（不可以，不可靠）</li>
+<li>当发送多个数据包时，它们是否会按照发送的顺序传递到接收主机中的传输层？（不可以，不保证顺序）</li>
+<li>发送两个连续数据包传输之间的时间量是否与其接收之间的时间量相同？（不，不提供时间保证）</li>
+<li>网络会提供有关网络拥塞的任何反馈吗？</li>
+</ul>
+<p>这些问题和其他问题的答案取决于<strong>网络层提供的服务模型。</strong></p>
+<p><strong>网络服务模型定义了发送主机和接收主机之间端到端数据包传送的特性</strong>：</p>
+<p>互联网（Internet）的网络层提供单一服务，称为<strong>尽力服务</strong>。</p>
+<p>对于尽力而为的服务，既不能保证数据包按照发送顺序接收，也不能保证它们的最终交付。无法保证端到端延迟，也没有最小带宽保证。尽力而为服务可能是根本不提供服务的委婉说法。</p>
+<p><em>其他网络架构</em>已经定义并实现了超出互联网尽力服务范围的服务模型。</p>
+<p>例如，ATM 网络体系结构 [Black 1995] 提供有保证的有序延迟、有界延迟和有保证的最小带宽。</p>
+<p>例如，Intserv 架构 [RFC 1633] 旨在提供端到端延迟保证和无拥塞通信。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/08/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%883%EF%BC%89%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1224,7 +1361,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
