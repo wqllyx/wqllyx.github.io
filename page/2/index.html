@@ -148,6 +148,122 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%881%EF%BC%89-%E4%BD%95%E4%B8%BA%E5%B9%B6%E5%8F%91/" class="post-title-link" itemprop="url">多线程与并发编程（1）----何为并发</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-03 08:19:50" itemprop="dateCreated datePublished" datetime="2024-06-03T08:19:50+08:00">2024-06-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="计算机系统中的并发"><a href="#计算机系统中的并发" class="headerlink" title="计算机系统中的并发"></a>计算机系统中的并发</h1><p>多处理器：有多个处理器插座。</p>
+<p>多核：一个处理器插座，只能有一个处理器安装，一个处理器有多个核心（独立执行计算的单元），每个核心可以有多个硬件线程（hart）</p>
+<h2 id="何为并发？"><a href="#何为并发？" class="headerlink" title="何为并发？"></a>何为并发？</h2><p>并发：单个系统在同时执行多个独立的任务。</p>
+<ul>
+<li>硬件并发：一台计算机系统提供多个核心、单个CPU提供多个硬件线程（hart）。</li>
+<li>软件并发：单个核心执行<strong>任务切换</strong>（task switch）。</li>
+</ul>
+<p>如果只有纯硬件并发，那么计算有多少硬件线程，就只能执行多少任务。</p>
+<p>而软件并发，理论上可以在迷惑应用程序和用户的前提下，“同时”执行多个任务。</p>
+<p>因此，现代计算机系统的并发是二者的结合。</p>
+<p>硬件并发和软件并发还是有着许多不同：</p>
+<ul>
+<li>内存模型的假设</li>
+<li>任务切换的负担</li>
+</ul>
+<h2 id="并发的方式（手段）"><a href="#并发的方式（手段）" class="headerlink" title="并发的方式（手段）"></a>并发的方式（手段）</h2><ul>
+<li>多进程（每个进程只有一个执行线程）</li>
+<li>多线程（每个进程有多个执行线程）</li>
+</ul>
+<h3 id="多进程并发"><a href="#多进程并发" class="headerlink" title="多进程并发"></a>多进程并发</h3><p>每个进程独立获得资源，进程之间互不干扰。</p>
+<p>通过进程间通信手段进行通信</p>
+<ul>
+<li>信号</li>
+<li>共享内存</li>
+<li>管道</li>
+<li>信号量</li>
+<li>消息队列</li>
+<li>等</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>进程切换开销大，导致速度慢</li>
+<li>进程管理需要操作系统维持（通过维持某些数据结构）</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>各个任务之间独立，安全性高。</li>
+</ul>
+<h3 id="多线程并发"><a href="#多线程并发" class="headerlink" title="多线程并发"></a>多线程并发</h3><p>在单个进程中执行多个线程。</p>
+<ul>
+<li>线程之间共享同一进程的大部分资源</li>
+<li>但可以有自己的执行序列（PC寄存器），因此，可以同时独立完成多个任务。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>同一个进程的共享数据的访问，要被正确同步。</li>
+</ul>
+<p>多个单线程&#x2F;进程间的通信(包含启动)要比单一进程中的多线程间的通信(包括启动)的开销大，若不考虑共享内存可能会带来的问题，多线程将会成为主流语言(包括C++)更青睐的并发途径。此外，C++标准并未对进程间通信提供任何原生支持，所以使用多进程的方式实现，这会依赖与平台相关的API。因此，本书只关注使用多线程的并发，并且在此之后所提到“并发”，均假设为多线程来实现。</p>
+<h3 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h3><p>不同的关注点</p>
+<p><strong>并行</strong>关注点：更注重性能，如何利用当前硬件的所有资源，来提高任务处理速度。</p>
+<p><strong>并发</strong>关注点：任务分离，任务响应。</p>
+<h3 id="关注点分离"><a href="#关注点分离" class="headerlink" title="关注点分离"></a>关注点分离</h3><p>互相独立的功能模块，可以在同一应用（进程）中分离，并行执行完成的任务，再进行信息的交换（需要手动处理交互逻辑）。</p>
+<p>这种思想使得，线程的数量不再依赖CPU中可用（hart）的数量，因为对线程的划分是基于概念上的设计，而不是一种增加吞吐量的尝试（根本目的并不是为了能够处理更多任务，但这样做确实大部分情况下都能增加吞吐量。）。</p>
+<h2 id="并发的方式"><a href="#并发的方式" class="headerlink" title="并发的方式"></a>并发的方式</h2><ul>
+<li>指令级并行</li>
+<li>数据级并行</li>
+<li>线程级并性（任务并行）</li>
+<li>多机并行</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/02/%E4%BD%BF%E7%94%A8hexo%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -400,7 +516,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

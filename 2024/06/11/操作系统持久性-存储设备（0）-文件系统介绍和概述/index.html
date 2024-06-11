@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="概述如果操作系统崩溃或电源故障，系统主内存的内容可能会丢失。相比之下，非易失性存储是持久的，并且在崩溃和断电时仍能保持其状态。非易失性存储还具有更高的容量和更低的成本。 然而，非易失性存储技术有其自身的缺点。  例如，当前的非易失性存储技术（例如磁盘和高密度闪存存储）不允许随机访问单个存储字；相反，访问必须以更粗粒度的单位进行——一次 512、2048 或更多字节。 此外，这些访问可能比访问 DR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统持久性--存储设备（0）--文件系统介绍和概述">
+<meta property="og:url" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="wqllyx的网站">
+<meta property="og:description" content="概述如果操作系统崩溃或电源故障，系统主内存的内容可能会丢失。相比之下，非易失性存储是持久的，并且在崩溃和断电时仍能保持其状态。非易失性存储还具有更高的容量和更低的成本。 然而，非易失性存储技术有其自身的缺点。  例如，当前的非易失性存储技术（例如磁盘和高密度闪存存储）不允许随机访问单个存储字；相反，访问必须以更粗粒度的单位进行——一次 512、2048 或更多字节。 此外，这些访问可能比访问 DR">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611144135477.png">
+<meta property="og:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611144335671.png">
+<meta property="og:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150436636.png">
+<meta property="og:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150644649.png">
+<meta property="og:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150723698.png">
+<meta property="article:published_time" content="2024-06-11T07:20:59.000Z">
+<meta property="article:modified_time" content="2024-06-11T07:20:59.781Z">
+<meta property="article:author" content="风">
+<meta property="article:tag" content="计算机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611144135477.png">
+
+<link rel="canonical" href="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>操作系统持久性--存储设备（0）--文件系统介绍和概述 | wqllyx的网站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wqllyx的网站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统持久性--存储设备（0）--文件系统介绍和概述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-11 15:20:59" itemprop="dateCreated datePublished" datetime="2024-06-11T15:20:59+08:00">2024-06-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>如果操作系统崩溃或电源故障，系统主内存的内容可能会丢失。相比之下，非易失性存储是持久的，并且在崩溃和断电时仍能保持其状态。非易失性存储还具有更高的容量和更低的成本。</p>
+<p>然而，非易失性存储技术有其自身的缺点。</p>
+<ul>
+<li>例如，当前的非易失性存储技术（例如磁盘和高密度闪存存储）不允许随机访问单个存储字；相反，访问必须以更粗粒度的单位进行——一次 512、2048 或更多字节。</li>
+<li>此外，这些访问可能比访问 DRAM 慢得多；</li>
+</ul>
+<p>这种巨大的差异（在旋转磁盘的情况下约为五个数量级）促使操作系统以不同于主内存的方式组织和使用持久存储设备。</p>
+<p><strong>文件系统是</strong>一种常见的操作系统抽象，允许应用程序访问非易失性存储。文件系统使用多种技术来应对非易失性存储设备的物理限制并为用户提供更好的抽象。例如，图 11.1 总结了<code>物理特性</code>如何激发文件系统设计的几个关键方面:</p>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>物理特点</th>
+<th>设计影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>高性能</td>
+<td>发起IO访问成本大</td>
+<td>使用文件、目录、可用空间位图和放置试探法组织数据放置，以便以大型连续单元访问存储 缓存以避免访问持久存储</td>
+</tr>
+<tr>
+<td>命名的数据</td>
+<td>存储容量大，不会崩溃，并且可以在程序之间共享</td>
+<td>支持具有有意义名称的文件和目录</td>
+</tr>
+<tr>
+<td>受控制的共享</td>
+<td>设备存储大量用户数据</td>
+<td>在文件中包含访问控制元数据</td>
+</tr>
+<tr>
+<td>可靠存储</td>
+<td>1.更新期间可能会发生崩溃<br />2. 存储设备可能会发生故障 <br /> 3.闪存单元可能会磨损</td>
+<td>1.使用事务使一组更新成为原子的<br />2.使用冗余来检测和纠正故障<br />3.将数据移动到不同的存储位置以均匀磨损</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>性能：</strong>文件系统通过对数据的放置位置进行分组来分摊启动昂贵操作的成本，例如移动磁盘臂或擦除固态内存块，以便此类操作访问大范围的连续存储</li>
+<li><strong>名字</strong>：文件系统将相关数据分组到目录和文件中，并为它们提供人类可读的名称（例如，&#x2F;home&#x2F;alice&#x2F;Pictures&#x2F;summer-vacation&#x2F;hiking.jpg。）即使在创建文件的程序退出之后，这些数据名称仍然有意义它们帮助用户组织大量存储，并且使用户可以轻松地使用不同的程序来创建、读取和编辑数据。</li>
+<li><strong>受控共享。</strong>文件系统包括有关谁拥有哪些文件以及允许哪些其他用户读取、写入或执行数据和程序文件的元数据</li>
+<li>**可靠性:**文件系统使用事务以原子方式更新多个持久存储块，类似于操作系统如何使用临界区以原子方式更新内存中的不同数据结构</li>
+</ul>
+<p>为了获得良好的性能和可接受的可靠性，应用程序编写者和操作系统设计者都必须了解存储设备和文件系统的工作原理。本章和接下来的三章讨论关键问题:</p>
+<p>其余部分通过描述典型的 <strong>API 和抽象集</strong>来介绍文件系统，并概述提供这些抽象的<strong>软件层</strong></p>
+<h1 id="文件系统抽象"><a href="#文件系统抽象" class="headerlink" title="文件系统抽象"></a>文件系统抽象</h1><p>文件系统抽象有两个关键部分：定义数据集的<strong>文件</strong>和定义文件名称的<strong>目录。</strong></p>
+<ol>
+<li><strong>文件</strong>。文件是文件系统中命名的<strong>数据集合</strong>。<ol>
+<li>文件的信息有两部分：元数据和数据。文件的元数据是操作系统理解和管理的有关文件的信息。例如，文件的元数据通常包括文件的大小、修改时间、所有者及其安全信息，例如文件是否可以由所有者或其他用户读取、写入或执行</li>
+<li>文件的数据可以是用户或应用程序放入其中的任何信息。从文件系统的角度来看，文件的数据只是一个无类型字节数组。</li>
+</ol>
+</li>
+</ol>
+<p><code>通常，操作系统将文件的数据视为无类型字节数组，将其留给应用程序来解释文件的内容。然而，有时操作系统需要能够解析文件的数据。例如，Linux 支持许多不同的可执行文件类型，例如 ELF 和 a.out 二进制文件以及 tcsh、csh 和 perl 脚本。Linux 通过让可执行文件以标识文件格式的幻数开头来实现此目的。例如，ELF 二进制可执行文件以四个字节 0x7f、0x45、0x4c 和 0x46（ASCII 字符 DEL、E、L 和 F）开头</code></p>
+<ol start="2">
+<li><strong>目录。</strong>文件包含系统定义的元数据和任意数据，而目录提供<strong>文件的名称</strong>。特别是，文件目录是人类可读名称的列表以及从每个名称到特定底层文件或目录的映射。</li>
+</ol>
+<p><strong>Volume卷(分区）:</strong></p>
+<p>文件系统是以分区为单位来进行管理的：</p>
+<ul>
+<li>不同的分区都有各自独立的文件系统。一台计算机可以通过在<code>单个逻辑层次结构（目录层次结构）</code>中<strong>挂载</strong>（安装）多个卷来利用多个卷上存储的文件系统。</li>
+<li>分区是逻辑磁盘的抽象。<ul>
+<li>一个磁盘可以对应一个分区</li>
+<li>一个磁盘也可以对应多分区。每个分区可以使用各自的文件系统组织数据。</li>
+<li>多个磁盘也可以对应一个分区。使得文件系统跨物理磁盘管理</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611144135477.png" alt="image-20240611144135477"></p>
+<p>例如，假设 USB 驱动器包含一个带有目录 &#x2F;Movies 和 &#x2F;Backup 的文件系统，如图 11.4 所示。如果 Alice 将该驱动器插入她的笔记本电脑，笔记本电脑的操作系统可能会使用路径 &#x2F;Volumes&#x2F;usb1&#x2F; 挂载 USB 卷的文件系统，如图 11.5 所示。然后，如果 Alice 调用 open(“&#x2F;Volumes&#x2F;usb1&#x2F;Movies&#x2F;vacation.mov”)，她将从 USB 驱动器卷上的文件系统中打开文件 &#x2F;Movies&#x2F;vacation.mov。相反，如果 Bob 将该驱动器插入他的笔记本电脑，则笔记本电脑的操作系统可能会使用路径 &#x2F;media&#x2F;disk-1 挂载卷的文件系统，并且 Bob 将使用路径 &#x2F;media&#x2F;disk-1&#x2F;Movies 访问同一文件&#x2F;vacation.mov。</p>
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h1 id="文件系统的软件层次"><a href="#文件系统的软件层次" class="headerlink" title="文件系统的软件层次"></a>文件系统的软件层次</h1><p><img src="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611144335671.png" alt="image-20240611144335671"></p>
+<p>如图11.7所示，操作系统通过一系列软件层来实现文件系统抽象。从广义上讲，这些层有两组任务：</p>
+<ul>
+<li><strong>向上 提供API给用户</strong>  <em>软件堆栈的顶层——库、内核级文件系统和内核的块缓存——提供了一个方便的API来访问命名文件</em>，并通过缓存、写缓冲（延迟写，回写）和预取来最大限度地减少缓慢的存储访问</li>
+<li><strong>向下 提供设备访问。</strong> <em>软件堆栈的较低级别为操作系统提供了访问各种 I&#x2F;O 设备的方法。</em> <strong>设备驱动程序</strong>通过为每个设备提供<strong>专用于</strong>此硬件的代码，并将该代码放置在操作系统其余部分可以使用的更简单、更通用的接口（例如块设备接口）后面，隐藏特定 I&#x2F;O 硬件的详细信息。<strong>设备驱动程序</strong>使用系统的主处理器和内存作为正常的内核级代码执行，但它们（CPU和内存）必须与 I&#x2F;O 设备交互。系统的处理器和内存使用内存映射 I&#x2F;O、DMA 和中断与其 I&#x2F;O 设备进行通信。</li>
+</ul>
+<p><strong>在其余部分中，我们首先讨论文件系统 API 和性能层。然后我们讨论设备访问。</strong></p>
+<h2 id="API-1"><a href="#API-1" class="headerlink" title="API"></a>API</h2><p><strong>文件系统软件堆栈的顶层（分为应用程序库和操作系统内核代码）提供文件系统 API，并提供缓存和写入缓冲以提高性能。</strong></p>
+<ul>
+<li><strong>系统调用和库。</strong>文件系统抽象（如图 11.6 所示的 API）可以直接由系统调用提供。或者，应用程序库可以<strong>包装</strong>系统调用以添加附加功能，例如<strong>缓冲</strong>(系统调用IO和标准库IO就这样)<ul>
+<li>后者（c库函数）的优点是该库包含缓冲区，可将程序的小型读取和写入聚合到访问较大块的系统调用中，从而减少开销。例如，如果程序使用库函数 fread() 读取 1 个字节的数据，则 fread() 实现可以使用 read() 系统调用将更大的数据块（例如 4 KB）读取到维护的缓冲区中通过应用程序地址空间中的库。然后，如果进程再次调用 fread() 来读取另一个字节，则库只需从缓冲区返回该字节，而无需执行系统调用。</li>
+</ul>
+</li>
+<li><strong>块缓存 Block cache</strong>：典型的存储设备比计算机的主内存慢得多。因此，<strong>操作系统的块缓存</strong>会缓存最近读取的块，并缓冲最近写入的块，以便稍后将它们写回存储设备。<ul>
+<li>除了通过缓存和写缓冲提高性能之外，块缓存还充当<strong>同步点</strong>：因为对给定块的所有请求都经过块缓存，所以操作系统在每个缓冲区缓存条目中包含信息，例如，阻止进程在另一个进程写入块时读取该块，或者确保给定的块仅从存储设备中获取一次，即使它被许多进程同时读取。</li>
+</ul>
+</li>
+<li><strong>预取Prefetching</strong>。操作系统使用预取来提高 I&#x2F;O 性能。例如，如果进程读取文件的前两个块，操作系统可能会预取接下来的十个块</li>
+</ul>
+<h2 id="设备驱动程序：通用抽象"><a href="#设备驱动程序：通用抽象" class="headerlink" title="设备驱动程序：通用抽象"></a>设备驱动程序：通用抽象</h2><p>设备驱动程序在操作系统实现的高级抽象与I&#x2F;O设备的硬件特定细节之间转换。</p>
+<p>操作系统可能必须处理<strong>许多不同</strong>的I&#x2F;O设备。</p>
+<p><code>例如，笔记本电脑可能连接到两个键盘（一个内部和一个外部），触控板，一只鼠标，一个有线以太网，无线802.11网络，一个无线蓝牙网络，两个磁盘驱动器（一个内部和一个磁盘驱动器（一个外部），麦克风，扬声器，相机，打印机，扫描仪和USB拇指驱动器。这只是当今可以连接到计算机的数千台设备中的少数。构建一个分别处理每种情况的操作系统将是不可能的。</code></p>
+<p><code>分层提供了访问各类设备的通用方法，有助于简化操作系统。例如，对于任何给定的操作系统，存储设备驱动程序通常实现标准块设备接口，允许以固定大小的块（例如，512、2048 或 4096 字节）读取或写入数据。</code></p>
+<p><code>在标准块设备接口上运行的文件系统可以将文件存储在任何存储设备上，只要该存储设备的驱动程序实现了该接口，无论是 Seagate 旋转磁盘驱动器、Intel 固态驱动器、Western Digital RAID 还是 Amazon Elastic Block Store 卷。这些设备都有不同的内部组织和控制寄存器，但如果每个制造商都提供导出标准接口的设备驱动程序，则操作系统的其余部分无需关心这些每个设备的详细信息</code></p>
+<h2 id="设备访问"><a href="#设备访问" class="headerlink" title="设备访问"></a>设备访问</h2><p>操作系统的<strong>设备驱动程序</strong>应如何与<strong>存储设备</strong>通信并控制存储设备？乍一看，存储设备似乎与我们迄今为止讨论的内存和 CPU 资源有很大不同。例如，磁盘驱动器包括多个电机、用于读取数据的传感器和用于写入数据的电磁体。</p>
+<h3 id="内存映射IO-（还有个端口映射IO）"><a href="#内存映射IO-（还有个端口映射IO）" class="headerlink" title="内存映射IO （还有个端口映射IO）"></a>内存映射IO （还有个端口映射IO）</h3><p>端口映射IO：提供额外的 I&#x2F;O 指令</p>
+<p>内存映射 I&#x2F;O（memory- mapped I&#x2F;O）：硬件将设备寄存器作为内存地址提供。</p>
+<p>端口映射 I&#x2F;O 在物理内存地址受限的体系结构中非常有用，因为 I&#x2F;O 设备不需要消耗物理内存地址范围。另一方面，对于具有足够大物理地址空间的系统，内存映射 I&#x2F;O 可以更简单，因为不需要定义新指令或地址范围，并且设备驱动程序可以使用任何标准内存访问指令来访问设备。此外，内存映射 I&#x2F;O 提供了更统一的模型来支持 <strong>DMA—-I&#x2F;O 设备和主存之间的直接传输</strong></p>
+<p><img src="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150436636.png" alt="image-20240611150436636"></p>
+<p><img src="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150644649.png" alt="image-20240611150644649"></p>
+<p>每个 I&#x2F;O 设备都有一个带有一组寄存器的<strong>控制器</strong>，可以写入和读取这些寄存器，以将命令和数据传输到设备或从设备传输命令和数据。例如，一个简单的键盘控制器可能有一个寄存器，可以通过读取该寄存器来了解最近按下的按键，以及另一个可以写入的寄存器来打开或关闭大写锁定灯。为了允许读写 I&#x2F;O 控制寄存器，系统实现了内存映射 I&#x2F;O。内存映射 I&#x2F;O 将每个设备的控制寄存器映射到内存总线上的一系列物理地址。 CPU 对此物理地址范围的读取和写入不会进入主内存。相反，它们会访问 I&#x2F;O 设备控制器上的寄存器。</p>
+<p><img src="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/image-20240611150723698.png" alt="image-20240611150723698"></p>
+<h3 id="DMA"><a href="#DMA" class="headerlink" title="DMA"></a>DMA</h3><p>许多 I&#x2F;O 设备（包括大多数存储设备）都会批量传输数据。例如，操作系统不会从磁盘读取一两个字，它们通常一次至少传输几千字节。 I&#x2F;O 设备可以使用直接内存访问，而不是要求 CPU 读取或写入大量传输的每个字。当使用直接内存访问 (DMA) 时，I&#x2F;O 设备在其自己的内存和系统主内存之间复制数据块。为了设置 DMA 传输，简单的操作系统可以使用内存映射 I&#x2F;O 来向设备提供目标物理地址、传输长度和操作代码。然后，设备将数据复制到目标地址或从目标地址复制数据，而无需额外的处理器参与。设置 DMA 传输后，在 DMA 传输完成之前，操作系统不得将目标物理页用于任何其他目的。因此，操作系统将目标页面“固定”在内存中，以便在取消固定之前无法重用它们。例如，固定的物理页无法交换到磁盘，然后重新映射到其他虚拟地址。</p>
+<p>为了设置 DMA 传输，简单的操作系统可以使用内存映射 I&#x2F;O 来向设备提供目标物理地址、传输长度和操作代码。然后，设备将数据复制到目标地址或从目标地址复制数据，而无需额外的处理器参与。设置 DMA 传输后，在 DMA 传输完成之前，操作系统不得将目标物理页用于任何其他目的。因此，操作系统将目标页面“固定”在内存中，以便在取消固定之前无法重用它们。例如，固定的物理页无法交换到磁盘，然后重新映射到其他虚拟地址</p>
+<h3 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h3><p><strong>操作系统需要知道 I&#x2F;O 设备何时完成对请求的处理或者新的外部输入何时到达</strong>。一种选择是轮询，即重复使用内存映射 I&#x2F;O 来读取设备上的状态寄存器。由于 I&#x2F;O 设备通常比 CPU 慢得多，并且 I&#x2F;O 设备接收的输入可能以不规则的速率到达，因此 I&#x2F;O 设备通常最好使用中断来通知操作系统重要事件</p>
+<h1 id="将它们放在一起：简单的磁盘请求"><a href="#将它们放在一起：简单的磁盘请求" class="headerlink" title="将它们放在一起：简单的磁盘请求"></a>将它们放在一起：简单的磁盘请求</h1><p>当进程发出像 read() 这样的系统调用来将数据从磁盘读取到进程的内存中时，操作系统会将调用线程移至等待队列。然后，操作系统使用内存映射 I&#x2F;O 来告诉磁盘读取请求的数据并设置 DMA，以便磁盘可以将该数据放入内核内存中。然后磁盘读取数据并将其 DMA 到主内存中；一旦完成，磁盘就会触发中断。然后，操作系统的中断处理程序将数据从内核缓冲区复制到进程的地址空间中。最后，操作系统将线程移动到就绪列表中。当线程下次运行时，它将从系统调用中返回，数据现在存在于指定的缓冲区中。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%881%EF%BC%89-%E7%A3%81%E7%9B%98%E6%9E%84%E9%80%A0/" rel="prev" title="操作系统持久性--存储设备（1）--磁盘构造">
+      <i class="fa fa-chevron-left"></i> 操作系统持久性--存储设备（1）--磁盘构造
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%8A%BD%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">文件系统抽象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#API"><span class="nav-number">2.1.</span> <span class="nav-text">API</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%B1%82%E6%AC%A1"><span class="nav-number">3.</span> <span class="nav-text">文件系统的软件层次</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#API-1"><span class="nav-number">3.1.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%EF%BC%9A%E9%80%9A%E7%94%A8%E6%8A%BD%E8%B1%A1"><span class="nav-number">3.2.</span> <span class="nav-text">设备驱动程序：通用抽象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E8%AE%BF%E9%97%AE"><span class="nav-number">3.3.</span> <span class="nav-text">设备访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84IO-%EF%BC%88%E8%BF%98%E6%9C%89%E4%B8%AA%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84IO%EF%BC%89"><span class="nav-number">3.3.1.</span> <span class="nav-text">内存映射IO （还有个端口映射IO）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DMA"><span class="nav-number">3.3.2.</span> <span class="nav-text">DMA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD"><span class="nav-number">3.3.3.</span> <span class="nav-text">中断</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%86%E5%AE%83%E4%BB%AC%E6%94%BE%E5%9C%A8%E4%B8%80%E8%B5%B7%EF%BC%9A%E7%AE%80%E5%8D%95%E7%9A%84%E7%A3%81%E7%9B%98%E8%AF%B7%E6%B1%82"><span class="nav-number">4.</span> <span class="nav-text">将它们放在一起：简单的磁盘请求</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">风</p>
+  <div class="site-description" itemprop="description">笔记记录</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">风</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
