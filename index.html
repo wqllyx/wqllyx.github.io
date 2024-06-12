@@ -148,6 +148,115 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/13/json%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%90%86%E8%AE%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="风">
+      <meta itemprop="description" content="笔记记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wqllyx的网站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/06/13/json%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%90%86%E8%AE%BA/" class="post-title-link" itemprop="url">json学习之理论</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-06-13 00:19:13" itemprop="dateCreated datePublished" datetime="2024-06-13T00:19:13+08:00">2024-06-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Json"><a href="#Json" class="headerlink" title="Json"></a>Json</h1><p>JSON(JavaScrip Object Notation)是一种轻量级的<strong>数据交换格式</strong>。它基于 ECMAScript (欧洲计算机协会制定的js规范)的一个子集，采用完全独立于编程语言的文本格式来存储和表示数据。简洁和清晰的层次结构使得 JSON 成为理想的数据交换语言。 易于人阅读和编写，同时也易于机器解析和生成，并有效地提升网络传输效率。</p>
+<p>关于上面的描述可以精简为一句话：<strong>Json是一种数据格式，和语言无关，在什么语言中都可以使用Json。</strong>基于这种通用的数据格式，一般处理两方面的任务：</p>
+<ul>
+<li>组织数据（数据序列化），用于数据的网络传输</li>
+<li>组织数据（数据序列化），写磁盘文件实现数据的持久化存储（一般以.json作为文件后缀）</li>
+</ul>
+<p>Json中主要有两种数据格式：Json数组和Json对象，并且这两种格式可以交叉嵌套使用，下面依次介绍下这两种数据格式：</p>
+<h2 id="Json数组"><a href="#Json数组" class="headerlink" title="Json数组"></a>Json数组</h2><p>Json数组使用 [] 表示，[]里边是元素，元素和元素之间使用逗号间隔，最后一个元素后边没有逗号，一个Json数组中支持同时存在多种不同类型的成员，包括：整形、 浮点、 字符串、 布尔类型、 json数组、 json对象、 空值-null。由此可见Json数组比起C&#x2F;C++数组要灵活很多。</p>
+<ul>
+<li>Json数组中的元素数据类型一致</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 整形</span></span><br><span class="line"><span class="punctuation">[</span><span class="number">1</span><span class="punctuation">,</span><span class="number">2</span><span class="punctuation">,</span><span class="number">3</span><span class="punctuation">,</span><span class="number">4</span><span class="punctuation">,</span><span class="number">5</span><span class="punctuation">]</span></span><br><span class="line"><span class="comment">// 字符串</span></span><br><span class="line"><span class="punctuation">[</span><span class="string">&quot;luffy&quot;</span><span class="punctuation">,</span> <span class="string">&quot;sanji&quot;</span><span class="punctuation">,</span> <span class="string">&quot;zoro&quot;</span><span class="punctuation">,</span> <span class="string">&quot;nami&quot;</span><span class="punctuation">,</span> <span class="string">&quot;robin&quot;</span><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Json数组中的元素数据类型不一致</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span><span class="number">12</span><span class="punctuation">,</span> <span class="number">13.34</span><span class="punctuation">,</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span> <span class="string">&quot;hello,world&quot;</span><span class="punctuation">,</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Json数组中的数组嵌套使用</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">[</span><span class="string">&quot;cat&quot;</span><span class="punctuation">,</span> <span class="string">&quot;dog&quot;</span><span class="punctuation">,</span> <span class="string">&quot;panda&quot;</span><span class="punctuation">,</span> <span class="string">&quot;beer&quot;</span><span class="punctuation">,</span> <span class="string">&quot;rabbit&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">[</span><span class="string">&quot;北京&quot;</span><span class="punctuation">,</span> <span class="string">&quot;上海&quot;</span><span class="punctuation">,</span> <span class="string">&quot;天津&quot;</span><span class="punctuation">,</span> <span class="string">&quot;重庆&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">[</span><span class="string">&quot;luffy&quot;</span><span class="punctuation">,</span> <span class="string">&quot;boy&quot;</span><span class="punctuation">,</span> <span class="number">19</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Json数组和对象嵌套使用</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;luffy&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">19</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;father&quot;</span><span class="punctuation">:</span><span class="string">&quot;Monkey·D·Dragon&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;grandpa&quot;</span><span class="punctuation">:</span><span class="string">&quot;Monkey D Garp&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;brother1&quot;</span><span class="punctuation">:</span><span class="string">&quot;Portgas D Ace&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;brother2&quot;</span><span class="punctuation">:</span><span class="string">&quot;Sabo&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Json对象"><a href="#Json对象" class="headerlink" title="Json对象"></a>Json对象</h2><p>Json对象使用 {} 来描述，每个Json对象中可以存储若干个元素，每一个元素对应一个键值对（key：value 结构），元素和元素之间使用逗号间隔，最后一个元素后边没有逗号。对于每个元素中的键值对有以下细节需要注意：</p>
+<ol>
+<li>键值（key）必须是字符串，位于同一层级的键值不要重复（因为是通过键值取出对应的value值）</li>
+<li>value值的类型是可选的，可根据实际需求指定，可用类型包括：整形、 浮点、 字符串、 布尔类型、 json数组、 json对象、 空值-null。</li>
+</ol>
+<p>使用Json对象描述一个人的信息:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Ace&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Sex&quot;</span><span class="punctuation">:</span><span class="string">&quot;man&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Age&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Family&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Father&quot;</span><span class="punctuation">:</span><span class="string">&quot;Gol·D·Roger&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Mother&quot;</span><span class="punctuation">:</span><span class="string">&quot;Portgas·D·Rouge&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Brother&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;Sabo&quot;</span><span class="punctuation">,</span> <span class="string">&quot;Monkey D. Luffy&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;IsAlive&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Comment&quot;</span><span class="punctuation">:</span><span class="string">&quot;yyds&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>通过上面的介绍可用看到，Json的结构虽然简单，但是进行嵌套之后就可以描述很复杂的事情，在项目开发过程中往往需要我们根据实际需求自己定义Json格式用来存储项目数据。</p>
+<p>另外，如果需要将Json数据持久化到磁盘文件中，需要注意一个问题：<strong>在一个Json文件中只能有一个Json数组或者Json对象的根节点，不允许同时存储多个并列的根节点。</strong>下面举例说明：</p>
+<ul>
+<li>错误的写法</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.json</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;luffy&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="number">19</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;user&quot;</span><span class="punctuation">:</span><span class="string">&quot;ace&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;passwd&quot;</span><span class="punctuation">:</span><span class="string">&quot;123456&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>错误原因：在一个Json文件中有两个并列的Json根节点（并列包含Json对象和Json对象、Json对象和Json数组、Json数组和Json数组），根节点只能有一个。</p>
+<ul>
+<li>正确的写法</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.json</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Ace&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Sex&quot;</span><span class="punctuation">:</span><span class="string">&quot;man&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Age&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Family&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Father&quot;</span><span class="punctuation">:</span><span class="string">&quot;Gol·D·Roger&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Mother&quot;</span><span class="punctuation">:</span><span class="string">&quot;Portgas·D·Rouge&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Brother&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;Sabo&quot;</span><span class="punctuation">,</span> <span class="string">&quot;Monkey D. Luffy&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;IsAlive&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Comment&quot;</span><span class="punctuation">:</span><span class="string">&quot;yyds&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的例子中通过Json对象以及Json数组的嵌套描述了一个人的身份信息，并且根节点只有一个就是Json对象，如果还需要使用Json数组或者Json对象描述其他信息，需要将这些信息写入到其他文件中，不要和这个Json对象并列写入到同一个文件里边，切记！！！</p>
+<hr>
+<p>作者: 苏丙榅<br>链接: <a target="_blank" rel="noopener" href="https://subingwen.cn/qt/json/">https://subingwen.cn/qt/json/</a><br>来源: 爱编程的大丙<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/11/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%8C%81%E4%B9%85%E6%80%A7-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%EF%BC%880%EF%BC%89-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%BB%8B%E7%BB%8D%E5%92%8C%E6%A6%82%E8%BF%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1427,185 +1536,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="风">
-      <meta itemprop="description" content="笔记记录">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="wqllyx的网站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/06/03/c-%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%881%EF%BC%89-%E9%94%81/" class="post-title-link" itemprop="url">c++ 设计线程池（1）----锁</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-06-03 10:25:40 / 修改时间：10:26:19" itemprop="dateCreated datePublished" datetime="2024-06-03T10:25:40+08:00">2024-06-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="线程池的好处"><a href="#线程池的好处" class="headerlink" title="线程池的好处"></a>线程池的好处</h2><p>线程的开启也是一个相对缓慢的过程。</p>
-<ul>
-<li>如果不用线程池，在系统运行过程中实时开启线程，销毁线程。会极大增加系统的负载。导致系统的实时性减低，业务处理能力也会降低</li>
-<li>服务器启动时，就事先创建好线程池，当业务来到时，直接从线程池取出一个线程来执行任务。任务完成后直接把线程归还给池，用于后续重复使用。</li>
-</ul>
-<h2 id="线程池的模式"><a href="#线程池的模式" class="headerlink" title="线程池的模式"></a>线程池的模式</h2><ul>
-<li>固定大小</li>
-<li>可变大小</li>
-</ul>
-<h2 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h2><p>并发编程的基本问题：</p>
-<ul>
-<li>互斥</li>
-<li>通信</li>
-</ul>
-<p>我们希望有一段代码被<strong>原子式</strong>执行，由于单处理器的任务切换（中断）或者多处理器的并行，我们不能保证。</p>
-<p>所以需要一种机制来保证原子性—–锁</p>
-<p>操作系统给上层提供了一个API，使得应用程序可以使用锁来达到代码执行的原子性。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lock_t</span> mutex; <span class="comment">// some globally-allocated lock &#x27;mutex&#x27;</span></span><br><span class="line">...</span><br><span class="line"><span class="built_in">lock</span>(&amp;mutex);</span><br><span class="line">... <span class="comment">// 临界区</span></span><br><span class="line"><span class="built_in">unlock</span>(&amp;mutex);</span><br></pre></td></tr></table></figure>
-
-<p>调用者调用lock尝试获取锁，如果没有其他现场持有锁，线程就会获得锁，进入临界区。否则，他就会阻塞。直到锁可用。（具体实现比这复杂）</p>
-<h3 id="锁的实现原理"><a href="#锁的实现原理" class="headerlink" title="锁的实现原理"></a>锁的实现原理</h3><p>锁定实现要求：</p>
-<ul>
-<li>​	提供互斥（保证临界区执行的原子性）</li>
-<li>公平性（不会有饿死线程）</li>
-<li>性能</li>
-</ul>
-<h4 id="方式1：控制中断"><a href="#方式1：控制中断" class="headerlink" title="方式1：控制中断"></a>方式1：控制中断</h4><p>缺点：</p>
-<ul>
-<li>需要应用进程有特权操作，因为中断需要特权操作</li>
-<li>只适合单处理器，多处理器无法保证互斥</li>
-<li>会导致中断丢失</li>
-<li>效率低。</li>
-</ul>
-<h4 id="方式-2：自旋锁"><a href="#方式-2：自旋锁" class="headerlink" title="方式 2：自旋锁"></a>方式 2：自旋锁</h4><p>需要硬件指令支持：<strong>test and set 指令 （原子交换）</strong></p>
-<blockquote>
-<p><strong>假设无硬件支持</strong>，我们很容易想到的一个锁（就是变量）实现是：(测试和设置不是原子操作)</p>
-</blockquote>
-<p>使用一个变量来标志锁是否被占有。这样进程在进入临界区时，会：</p>
-<ul>
-<li>检查标志，如果可以进入就进入临界区吗，设置锁标志。不能就阻塞等待。</li>
-<li>在退出临界区时，清除标志。</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">lock_t</span> &#123; <span class="type">int</span> flag; &#125; <span class="type">lock_t</span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">(<span class="type">lock_t</span> *mutex)</span> </span>&#123;</span><br><span class="line"><span class="comment">// 0 -&gt; lock is available, 1 -&gt; held</span></span><br><span class="line">mutex-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">(<span class="type">lock_t</span> *mutex)</span> </span>&#123;</span><br><span class="line"><span class="keyword">while</span> (mutex-&gt;flag == <span class="number">1</span>) <span class="comment">// TEST the flag</span></span><br><span class="line">; <span class="comment">// spin-wait (do nothing)</span></span><br><span class="line">mutex-&gt;flag = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// now SET it!</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">(<span class="type">lock_t</span> *mutex)</span> </span>&#123;</span><br><span class="line">mutex-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>不能保证互斥：</p>
-<ul>
-<li><p>如果线程1在测试时，被中断到线程2，</p>
-</li>
-<li><p>线程2执行测试并成功设置了标志。此时又被中断</p>
-</li>
-<li><p>线程1，此时测试也会成功。两者同时进入了临界区</p>
-</li>
-</ul>
-<p>性能问题：</p>
-<p>自旋会导致白白浪费CPU资源</p>
-<blockquote>
-<p>test and set 硬件（原子交换）指令，我们可以实现一个满足要求的最简单的锁—-自旋锁</p>
-</blockquote>
-<p>test and set 的原理：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 这就是一个交换操作，只不过硬件保证了他的原子性。</span><br><span class="line">int TestAndSet(int *old_ptr, int new) &#123;</span><br><span class="line"></span><br><span class="line">int old = *old_ptr; // 获取旧值</span><br><span class="line">*old_ptr = new;// 设置新值</span><br><span class="line">return old;// 返回旧值。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>自旋锁的实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">lock_t</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> flag;</span><br><span class="line">&#125; <span class="type">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line"><span class="comment">// 0 indicates that lock is available, 1 that it is held</span></span><br><span class="line">	lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">while</span> (<span class="built_in">TestAndSet</span>(&amp;lock-&gt;flag, <span class="number">1</span>) == <span class="number">1</span>); <span class="comment">// spin-wait (do nothing)</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">	lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>工作场景模拟：</p>
-<ul>
-<li><p>当调用lock时，如果没有线程持有锁，flag&#x3D;0，原子交换指令flag&#x3D;1，返回旧flag&#x3D;0，循环为假，跳出，获得锁。（这是原子操作，不会被中断）</p>
-</li>
-<li><p>如果在执行完原子指令之后，被中断（此时flag&#x3D;1，）别的线程如果执行原子交换指令，while循环一致为真，导致自旋。保证了互斥</p>
-</li>
-<li><p>只有在第一个线程结束执行，调用unlock时，才会解除自旋。</p>
-</li>
-</ul>
-<p>自旋锁：</p>
-<p>保证了互斥，但没有保证公平。</p>
-<p>有可能某个线程会一直自旋下去，导致饿死。</p>
-<blockquote>
-<p>compare-and-exchange 硬件支持的原子指令</p>
-</blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果满足期望的值，则会将锁交换。否则，什么也不做。返回锁原来的值。</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">CompareAndSwap</span><span class="params">(<span class="type">int</span> *ptr, <span class="type">int</span> expected, <span class="type">int</span> <span class="keyword">new</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">int</span> actual = *ptr;</span><br><span class="line">	<span class="keyword">if</span> (actual == expected)</span><br><span class="line">		*ptr = <span class="keyword">new</span>;</span><br><span class="line">	<span class="keyword">return</span> actual;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用这条指令来实现自旋锁和上面的指令差不多：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">while</span> (<span class="built_in">CompareAndSwap</span>(&amp;lock-&gt;flag, <span class="number">0</span>, <span class="number">1</span>) == <span class="number">1</span>); <span class="comment">// spin</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在无等待同步（wait-free synchronization）时，这个指令比test and set强大、</p>
-<blockquote>
-<p>链接的加载（load-linked）和条件式存储（store-conditional）指令	原子指令</p>
-</blockquote>
-<p>连接加载：从内存中取出一个值到寄存器，（可以理解为解引用一个地址。）</p>
-<p>条件式存储：只有上次从地址A取出的值，自从上次取出之后，没有被人家更改过（也就是说这个值还是那个值），才会去操作这个地址。）</p>
-<h4 id="ticket-锁"><a href="#ticket-锁" class="headerlink" title="ticket 锁"></a>ticket 锁</h4><blockquote>
-<p>获取并增加fetch-and-add 原子指令 </p>
-</blockquote>
-<p>它能原子地返回特定地址的旧值，并且让该值自增一。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">FetchAndAdd</span><span class="params">(<span class="type">int</span> *ptr)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> old = *ptr;</span><br><span class="line">    *ptr = old + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> old;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">lock_t</span> &#123;</span><br><span class="line">	<span class="type">int</span> ticket；<span class="comment">//车票</span></span><br><span class="line">	<span class="type">int</span> turn; <span class="comment">//（轮到自己）</span></span><br><span class="line">&#125; <span class="type">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">lock_init</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">    lock-&gt;ticket = <span class="number">0</span>;</span><br><span class="line">    lock-&gt;turn  <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> myturn = <span class="built_in">FetchAndAdd</span>(&amp;lock-&gt;ticket);</span><br><span class="line">	<span class="keyword">while</span> (lock-&gt;turn != myturn); <span class="comment">// spin</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">(<span class="type">lock_t</span> *lock)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">FetchAndAdd</span>(&amp;lock-&gt;turn);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>相当于先买票，再排队。</p>
-<p>使用两个变量，构建锁：</p>
-<p>获取锁的方式：</p>
-<ul>
-<li>先买票（调用获取并增加指令），此时自己的lock-&gt;ticket 为1，表示自己有票了。</li>
-<li>再去排队（while循环），如果轮到自己了，就可以获得锁。</li>
-</ul>
-<p><strong>既可以保证互斥也可以保证公平性。</strong></p>
-<h4 id="自旋过长时间的应对方法-—-yield-系统调用"><a href="#自旋过长时间的应对方法-—-yield-系统调用" class="headerlink" title="自旋过长时间的应对方法 —- yield()系统调用"></a>自旋过长时间的应对方法 —- yield()系统调用</h4><p>在以上公平互斥锁的基础上，还有一个问题：</p>
-<p>如果处于临界区中的线程被中断，其他线程就得长时间自旋等待。</p>
-<p>解决办法：</p>
-<ul>
-<li>yield()系统调用：在线程发现锁被别人持有时，主动调用yield让出锁，是自己进入就绪态。</li>
-</ul>
-<p>在两个线程下工作的很好。</p>
-<p>缺点：如果在许多线程下反复竞争一把锁时，一个线程长时间持有锁，会导致其他线程全部让出锁，知道持有锁的继续执行。</p>
-<h4 id="解决让出过多问题-—-使用等待队列，睡眠代替自旋。"><a href="#解决让出过多问题-—-使用等待队列，睡眠代替自旋。" class="headerlink" title="解决让出过多问题 —- 使用等待队列，睡眠代替自旋。"></a>解决让出过多问题 —- 使用等待队列，睡眠代替自旋。</h4><p>前面一些方法的真正问题是存在太多的偶然性。调度程序决定如何调度。如果调度不合理，线程或者一直自旋（第一种方法），或者立刻让出 CPU（第二种方法）。无论哪种方法，都可能造成浪费，也能防止饿死。</p>
-<p>因此，我们必须<strong>显式地施加某种控制，决定锁释放时，谁能抢到锁（排队）</strong>。为了做到这一点，我们需要操作系统的更多支持，并需要一个队列来保存等待锁的线程</p>
-<p>睡眠与唤醒。</p>
-<p>一个线程如果尝试获得锁，失败，自己会陷入睡眠。等到获得锁的线程结束执行时，他会唤醒正在睡眠的线程队列。队列中如果没有人有紧急情况，就会按排队顺序接着下一个线程执行。</p>
-<p>例如，Linux 提供了 futex，具体来说，每个 futex 都关联一个特定的物理内存位置，也有一个事先建好的内核队列。调用者通过futex 调用（见下面的描述）来睡眠或者唤醒。<br>具体来说，有两个调用。调用 futex_wait(address, expected)时，如果 address 处的值等于expected，就会让调线程睡眠。否则，调用立刻返回。调用 futex_wake(address)唤醒等待队列中的一个线程。图 28.9 是 Linux 环境下的例子：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">mutex_lock</span><span class="params">(<span class="type">int</span> *mutex)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> v;</span><br><span class="line">    <span class="comment">/*首先测试mutixc值为是否0，如果是，说明没人等待，并且锁是空闲的。也就是说只有我自己想要锁。那我直接拿。并把最高位设置为1.*/</span></span><br><span class="line">  	</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">atomic_bit_test_set</span>(mutex, <span class="number">31</span>) == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 否则，等待者加1.</span></span><br><span class="line">    <span class="built_in">atomic_increment</span>(mutex);</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 再次循环尝试获得锁。</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">atomic_bit_test_set</span>(mutex, <span class="number">31</span>) == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 如果，获得了，等待者减一。</span></span><br><span class="line">            <span class="built_in">atomic_decrement</span>(mutex);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* We have to wait now. First make sure the futex value</span></span><br><span class="line"><span class="comment">        we are monitoring is truly negative (i.e. locked).*/</span></span><br><span class="line">        v = *mutex;</span><br><span class="line">        <span class="keyword">if</span> (v &gt;= <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        <span class="comment">// 如果执行到这，说明锁已经没了，我们需要等待。</span></span><br><span class="line">        <span class="built_in">futex_wait</span>(mutex, v);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">mutex_unlock</span><span class="params">(<span class="type">int</span> *mutex)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">/* Adding 0x80000000 to the counter results in 0 if and only if</span></span><br><span class="line"><span class="comment">    there are not other interested threads */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">atomic_add_zero</span>(mutex, <span class="number">0x80000000</span>))</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">/* There are other threads waiting for this mutex,</span></span><br><span class="line"><span class="comment">    wake one of them up.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">futex_wake</span>(mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码来自 nptl 库（gnu libc 库的一部分）[L09]中 lowlevellock.h，它很有趣。基本上，它利用一个整数，同时记录锁是否被持有（整数的最高位），以及等待者的个数（整数的其余所有位）。因此，如果锁是负的，它就被持有（因为最高位被设置，该位决定了整数的符号）。这段代码的有趣之处还在于，它展示了如何优化常见的情况，即没有竞争时：只有一个线程获取和释放锁，所做的工作很少（获取锁时测试和设置的原子位运算，释放锁时原子的加法）。</p>
-<h4 id="两阶段锁"><a href="#两阶段锁" class="headerlink" title="两阶段锁"></a>两阶段锁</h4><p>两阶段锁的第一阶段会先自旋一段时间，希望它可以获取锁。<br>如果第一个自旋阶段没有获得锁，第二阶段调用者会睡眠，直到锁可用。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1675,7 +1605,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
